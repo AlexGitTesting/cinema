@@ -20,7 +20,7 @@ public class CinemaHall extends AuditableEntity {
     @Column(name = "seats_amount", nullable = false)
     private Short seatsAmount;
     @Type(type = "jsonb")
-    @Column(name = "seats_type", nullable = false)
+    @Column(name = "seats_type", nullable = false, columnDefinition = "jsonb")
     private EnumMap<SeatType, HashSet<Integer>> seatsType;
 
     public CinemaHall() {
@@ -89,9 +89,8 @@ public class CinemaHall extends AuditableEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CinemaHall)) return false;
+        if (!(o instanceof CinemaHall that)) return false;
         if (!super.equals(o)) return false;
-        CinemaHall that = (CinemaHall) o;
         return Objects.equals(getName(), that.getName()) && Objects.equals(getSeatsAmount(), that.getSeatsAmount()) && Objects.equals(getSeatsType(), that.getSeatsType());
     }
 

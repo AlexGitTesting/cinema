@@ -11,18 +11,18 @@ import java.util.Objects;
 @Entity
 @Table(name = "time_table")
 public class TimeTable extends AuditableEntity {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "movie_id", nullable = false, updatable = false)
     private Movie movie;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cinema_hall_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cinema_hall_id", nullable = false, updatable = false)
     private CinemaHall cinemaHall;
     @Column(name = "start_session", nullable = false)
     private LocalDateTime startSession;
     @Column(name = "base_price", nullable = false)
     private Short basePrice;
     @Type(type = "jsonb")
-    @Column(name = "closed_seats")
+    @Column(name = "closed_seats", columnDefinition = "jsonb")
     private HashSet<Short> closedSeats;
     @Column(name = "sold", nullable = false)
     private Boolean isSold;
@@ -117,9 +117,8 @@ public class TimeTable extends AuditableEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TimeTable)) return false;
+        if (!(o instanceof TimeTable timeTable)) return false;
         if (!super.equals(o)) return false;
-        TimeTable timeTable = (TimeTable) o;
         return Objects.equals(getMovie(), timeTable.getMovie()) && Objects.equals(getCinemaHall(), timeTable.getCinemaHall()) && Objects.equals(getStartSession(), timeTable.getStartSession()) && getBasePrice().equals(timeTable.getBasePrice()) && getClosedSeats().equals(timeTable.getClosedSeats()) && isSold.equals(timeTable.isSold);
     }
 

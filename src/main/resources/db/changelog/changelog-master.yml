@@ -13,3 +13,9 @@ databaseChangeLog:
   - include:
       file: DDL/002_cinema_hall.sql
       relativeToChangelogFile: true
+  - include:
+      file: DDL/003_create_timetable.sql
+      relativeToChangelogFile: true
+  - include:
+      file: DDL/004_create_order.sql
+      relativeToChangelogFile: true
