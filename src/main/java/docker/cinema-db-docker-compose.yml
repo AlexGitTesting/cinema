@@ -1,0 +1,9 @@
+version: '2.2'
+services:
+  cinema-db:
+    restart: always
+    image: postgres
+    ports:
+      - "127.0.0.1:5439:5432"
+    env_file:
+      - cinema-db.env

@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Alexandr_Yefriemov
+
+  - include:
+      file: DDL/001_create_table_movie.sql
+      relativeToChangelogFile: true
+
+  - changeSet:
+      id: 2
+      author: Alexandr_Yefriemov
+  - include:
+      file: DDL/002_cinema_hall.sql
+      relativeToChangelogFile: true
