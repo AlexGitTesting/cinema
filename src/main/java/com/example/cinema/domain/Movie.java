@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "movie")
@@ -54,5 +55,29 @@ public class Movie extends AuditableEntity {
 
     public void setProducer(String producer) {
         this.producer = producer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Movie)) return false;
+        if (!super.equals(o)) return false;
+        Movie movie = (Movie) o;
+        return getTitle().equals(movie.getTitle()) && getTiming().equals(movie.getTiming()) && getProducer().equals(movie.getProducer());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getTitle(), getTiming(), getProducer());
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id=" + getId() + '\'' +
+                "title='" + title + '\'' +
+                ", timing=" + timing +
+                ", producer='" + producer + '\'' +
+                '}';
     }
 }

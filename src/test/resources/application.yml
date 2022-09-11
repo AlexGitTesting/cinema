@@ -1,0 +1,32 @@
+spring:
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: on
+        highlight_sql: on
+        use_sql_comments: off
+        #        generate_statistics: on
+        criteria:
+        literal_handling_mode: BIND
+  test:
+    database:
+      replace: none
+
+  liquibase:
+    change-log: db/changelog/changelog-master.yml
+
+  datasource:
+    url: jdbc:tc:postgresql:latest:///test
+    username: cinema_user
+    password: cinema_password
+
+
+logging:
+  level:
+    sql: warn
+    root: info
+    web: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
