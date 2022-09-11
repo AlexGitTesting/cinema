@@ -1,0 +1,1 @@
+truncate time_table cascade;

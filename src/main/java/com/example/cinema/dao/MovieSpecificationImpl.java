@@ -25,7 +25,7 @@ public class MovieSpecificationImpl implements MovieSpecification {
             applyOrder(root, query, cb, filter.isSortingAscending());
             filter.getTitle().ifPresent(title -> addPredicateIfExists(predicates, title, root.get(Movie_.title), cb));
             filter.getProducer().ifPresent((producer -> addPredicateIfExists(predicates, producer, root.get(Movie_.producer), cb)));
-            if (filter.isNotStarted()) {
+            if (filter.isActive()) {
                 predicates.add(cb.in(root.get(Movie_.id)).value(findActiveFilmsFromTimeTable(cb, query)));
             }
             return predicates.isEmpty()

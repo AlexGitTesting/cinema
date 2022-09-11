@@ -16,7 +16,10 @@ public class MovieQueryFilter implements Serializable {
     private final boolean sortingAscending;
     private final String title;
     private final String producer;
-    private final boolean notStarted;
+    /**
+     * false- all movies, true the session will be started from the current time
+     */
+    private final boolean isActive;
 
     private MovieQueryFilter(Builder builder) {
         this.page = builder.page == null || builder.page < 0 ? 0 : builder.page;
@@ -24,7 +27,7 @@ public class MovieQueryFilter implements Serializable {
         this.sortingAscending = builder.sortingAscending;
         this.title = builder.title;
         this.producer = builder.producer;
-        this.notStarted = builder.notStarted;
+        this.isActive = builder.notStarted;
     }
 
 
@@ -52,8 +55,8 @@ public class MovieQueryFilter implements Serializable {
         return ofNullable(producer);
     }
 
-    public boolean isNotStarted() {
-        return notStarted;
+    public boolean isActive() {
+        return isActive;
     }
 
     // TODO: 11.09.2022 equals & hash
@@ -62,12 +65,12 @@ public class MovieQueryFilter implements Serializable {
         if (this == o) return true;
         if (!(o instanceof MovieQueryFilter)) return false;
         MovieQueryFilter that = (MovieQueryFilter) o;
-        return isSortingAscending() == that.isSortingAscending() && isNotStarted() == that.isNotStarted() && Objects.equals(getPage(), that.getPage()) && Objects.equals(getLimit(), that.getLimit()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getProducer(), that.getProducer());
+        return isSortingAscending() == that.isSortingAscending() && isActive() == that.isActive() && Objects.equals(getPage(), that.getPage()) && Objects.equals(getLimit(), that.getLimit()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getProducer(), that.getProducer());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPage(), getLimit(), isSortingAscending(), getTitle(), getProducer(), isNotStarted());
+        return Objects.hash(getPage(), getLimit(), isSortingAscending(), getTitle(), getProducer(), isActive());
     }
 
     @JsonPOJOBuilder(withPrefix = "")
