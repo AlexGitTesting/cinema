@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class TimeTableRepositoryTest extends BaseDataJpaTest {
     @Autowired
     private TimeTableRepository repository;
+    @PersistenceContext
+    private EntityManager entityManager;
 //    @Autowired
 //    private TimeTableSpecificationImpl specification;
 
@@ -41,6 +45,7 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     @Transactional
     void deleteById() {
         repository.deleteById(1002L);
+        entityManager.flush();
         assertTrue(() -> repository.findById(1002L).isEmpty());
 
     }
