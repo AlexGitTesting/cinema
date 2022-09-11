@@ -1,5 +1,8 @@
 package com.example.cinema.core;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum SeatType {
     BLIND(0.5d),
     LUXURY(1.2d),

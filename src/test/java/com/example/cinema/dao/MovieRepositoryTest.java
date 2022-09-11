@@ -1,6 +1,5 @@
-package com.example.cinema.dto;
+package com.example.cinema.dao;
 
-import com.example.cinema.dao.MovieRepository;
 import com.example.cinema.domain.Movie;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingSupplier;

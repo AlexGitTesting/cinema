@@ -1,0 +1,1 @@
+truncate cinema_hall cascade;

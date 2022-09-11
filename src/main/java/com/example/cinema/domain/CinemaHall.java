@@ -14,6 +14,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "cinema_hall")
 public class CinemaHall extends AuditableEntity {
+    {
+        seatsType = new EnumMap<>(SeatType.class);
+    }
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -49,9 +52,6 @@ public class CinemaHall extends AuditableEntity {
     }
 
     public EnumMap<SeatType, HashSet<Integer>> getSeatsType() {
-        if (seatsType == null) {
-            seatsType = new EnumMap<>(SeatType.class);
-        }
         return seatsType;
     }
 
