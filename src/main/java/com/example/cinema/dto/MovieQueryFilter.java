@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 @JsonDeserialize(builder = MovieQueryFilter.Builder.class)
 public class MovieQueryFilter implements Serializable {
@@ -41,12 +44,12 @@ public class MovieQueryFilter implements Serializable {
         return sortingAscending;
     }
 
-    public String getTitle() {
-        return title;
+    public Optional<String> getTitle() {
+        return ofNullable(title);
     }
 
-    public String getProducer() {
-        return producer;
+    public Optional<String> getProducer() {
+        return ofNullable(producer);
     }
 
     public boolean isNotStarted() {
