@@ -31,9 +31,6 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     private TimeTableRepository repository;
     @PersistenceContext
     private EntityManager entityManager;
-//    @Autowired
-//    private TimeTableSpecificationImpl specification;
-
 
     @Test
     @Transactional

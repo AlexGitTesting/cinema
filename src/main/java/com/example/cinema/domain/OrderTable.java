@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "order_table")
-public class Order extends AuditableEntity {
+public class OrderTable extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "time_table_id", nullable = false, updatable = false)
     private TimeTable timeTable;
@@ -26,10 +26,10 @@ public class Order extends AuditableEntity {
         seats = new HashSet<>();
     }
 
-    public Order() {
+    public OrderTable() {
     }
 
-    public Order(Long id, @NonNull TimeTable timeTable, @NonNull Integer orderPrice, String customer) {
+    public OrderTable(Long id, @NonNull TimeTable timeTable, @NonNull Integer orderPrice, String customer) {
         super(id);
         this.timeTable = timeTable;
         this.orderPrice = orderPrice;
@@ -63,9 +63,9 @@ public class Order extends AuditableEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Order order)) return false;
+        if (!(o instanceof OrderTable orderTable)) return false;
         if (!super.equals(o)) return false;
-        return getTimeTable().equals(order.getTimeTable()) && getOrderPrice().equals(order.getOrderPrice()) && getSeats().equals(order.getSeats()) && Objects.equals(customer, order.customer);
+        return getTimeTable().equals(orderTable.getTimeTable()) && getOrderPrice().equals(orderTable.getOrderPrice()) && getSeats().equals(orderTable.getSeats()) && Objects.equals(customer, orderTable.customer);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Order extends AuditableEntity {
 
     @Override
     public String toString() {
-        return "Order{" +
+        return "OrderTable{" +
                 "timeTable=" + timeTable +
                 ", orderPrice=" + orderPrice +
                 ", seats=" + seats +
