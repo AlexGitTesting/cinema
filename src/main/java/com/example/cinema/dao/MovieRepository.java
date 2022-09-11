@@ -1,4 +1,4 @@
-package com.example.cinema.dto;
+package com.example.cinema.dao;
 
 import com.example.cinema.domain.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
