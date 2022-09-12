@@ -1,4 +1,4 @@
-package com.example.cinema.dto;
+package com.example.cinema.dao;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;

@@ -37,6 +37,10 @@ public class TimeTable extends AuditableEntity {
     public TimeTable() {
     }
 
+    public TimeTable(Long id) {
+        super(id);
+    }
+
     public TimeTable(Long id, @NonNull Movie movie, @NonNull CinemaHall cinemaHall, @NonNull LocalDateTime startSession, @NonNull Short basePrice, @NonNull Boolean isSold) {
         super(id);
         this.movie = movie;

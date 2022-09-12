@@ -34,7 +34,7 @@ class MovieRepositoryTest extends BaseDataJpaTest {
         final Movie movie = assertDoesNotThrow((ThrowingSupplier<Movie>) byId::orElseThrow);
         assertEquals(1000L, movie.getId());
         assertEquals("Interstellar", movie.getTitle());
-        assertEquals((short) 90, movie.getTiming());
+        assertEquals((short) 75, movie.getTiming());
     }
 
     @Test

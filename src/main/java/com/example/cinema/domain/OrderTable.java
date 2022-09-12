@@ -29,6 +29,10 @@ public class OrderTable extends AuditableEntity {
     public OrderTable() {
     }
 
+    public OrderTable(TimeTable timeTable) {
+        this.timeTable = timeTable;
+    }
+
     public OrderTable(Long id, @NonNull TimeTable timeTable, @NonNull Integer orderPrice, String customer) {
         super(id);
         this.timeTable = timeTable;
@@ -58,6 +62,14 @@ public class OrderTable extends AuditableEntity {
 
     public void setSeats(@NonNull HashSet<Short> seats) {
         this.seats.addAll(seats);
+    }
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(String customer) {
+        this.customer = customer;
     }
 
     @Override

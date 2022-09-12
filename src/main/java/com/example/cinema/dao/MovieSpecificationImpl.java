@@ -4,7 +4,6 @@ import com.example.cinema.domain.Movie;
 import com.example.cinema.domain.Movie_;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.domain.TimeTable_;
-import com.example.cinema.dto.MovieQueryFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
