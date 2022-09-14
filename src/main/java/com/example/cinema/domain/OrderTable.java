@@ -6,18 +6,24 @@ import org.springframework.lang.NonNull;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
+/**
+ * Entity for order.
+ *
+ * @author Alexandr Yefremov
+ */
 @Entity
 @Table(name = "order_table")
 public class OrderTable extends AuditableEntity {
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "time_table_id", nullable = false, updatable = false)
-    private TimeTable timeTable;
-    @JoinColumn(name = "order_price", nullable = false)
-    private Integer orderPrice;
     @Type(type = "jsonb")
     @Column(name = "seats", columnDefinition = "jsonb", nullable = false)
-    private HashSet<Short> seats;
+    private final Set<Short> seats;
+    @JoinColumn(name = "order_price", nullable = false)
+    private Integer orderPrice;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "time_table_id", nullable = false)
+    private TimeTable timeTable;
     @Column(name = "customer")
     private String customer;
 
@@ -56,7 +62,7 @@ public class OrderTable extends AuditableEntity {
         this.orderPrice = orderPrice;
     }
 
-    public HashSet<Short> getSeats() {
+    public Set<Short> getSeats() {
         return seats;
     }
 
