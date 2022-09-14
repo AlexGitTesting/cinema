@@ -33,3 +33,11 @@ databaseChangeLog:
   - include:
       file: DML/002_fill_in_cinema_hall.sql
       relativeToChangelogFile: true
+  - changeSet:
+      id: 5
+      author: Alexandr_Yefriemov
+  - include:
+      file: DDL/005_order_cascade_rem.sql
+      relativeToChangelogFile: true
+
+

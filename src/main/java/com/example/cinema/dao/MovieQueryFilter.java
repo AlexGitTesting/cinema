@@ -9,6 +9,11 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Filter for query movies.
+ *
+ * @author Alexandr Yefremov
+ */
 @JsonDeserialize(builder = MovieQueryFilter.Builder.class)
 public class MovieQueryFilter implements Serializable {
     private final Integer page;
@@ -59,12 +64,10 @@ public class MovieQueryFilter implements Serializable {
         return isActive;
     }
 
-    // TODO: 11.09.2022 equals & hash
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MovieQueryFilter)) return false;
-        MovieQueryFilter that = (MovieQueryFilter) o;
+        if (!(o instanceof MovieQueryFilter that)) return false;
         return isSortingAscending() == that.isSortingAscending() && isActive() == that.isActive() && Objects.equals(getPage(), that.getPage()) && Objects.equals(getLimit(), that.getLimit()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getProducer(), that.getProducer());
     }
 
@@ -107,7 +110,7 @@ public class MovieQueryFilter implements Serializable {
             return this;
         }
 
-        public MovieQueryFilter.Builder notStarted(final boolean notStarted) {
+        public MovieQueryFilter.Builder isActive(final boolean notStarted) {
             this.notStarted = notStarted;
             return this;
         }

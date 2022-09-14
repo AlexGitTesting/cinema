@@ -1,8 +1,9 @@
 --liquibase formatted sql
 --changeset A.Yefriemov:fill-in-cinema-hall
 
-insert into cinema_hall(name, seats_amount, seats_type)
-values ('RED', 10, '{
+-- truncate table cinema_hall restart identity ;
+insert into cinema_hall(id, created_date, modified_date, name, seats_amount, seats_type)
+values (1, '2022-09-14 00:04:36.215', '2022-09-14 00:04:36.215', 'RED', 10, '{
   "BLIND": [
     1,
     2,
@@ -20,7 +21,7 @@ values ('RED', 10, '{
     10
   ]
 }'),
-       ('BLUE', 12, '{
+       (2, '2022-09-14 00:04:36.215', '2022-09-14 00:04:36.215', 'BLUE', 12, '{
          "BLIND": [
            1,
            2,
@@ -40,3 +41,4 @@ values ('RED', 10, '{
            12
          ]
        }');
+alter sequence cinema_hall_id_seq restart with 3;

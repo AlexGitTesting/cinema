@@ -15,6 +15,11 @@ import java.util.List;
 
 import static org.springframework.util.StringUtils.hasText;
 
+/**
+ * Implementation of {@link MovieSpecification}.
+ *
+ * @author Alexandr Yefremov
+ */
 @Component
 public class MovieSpecificationImpl implements MovieSpecification {
     @Override
@@ -33,6 +38,9 @@ public class MovieSpecificationImpl implements MovieSpecification {
         }));
     }
 
+    /**
+     * SubQuery to find movie's ids that are active
+     */
     private Subquery<Long> findActiveFilmsFromTimeTable(CriteriaBuilder cb, CriteriaQuery<?> query) {
         final Subquery<Long> subQuery = query.subquery(Long.class);
         final Root<TimeTable> root = subQuery.from(TimeTable.class);
