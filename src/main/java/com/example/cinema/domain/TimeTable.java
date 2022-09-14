@@ -7,7 +7,16 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
+import static java.lang.Boolean.FALSE;
+import static java.util.Collections.unmodifiableSet;
+
+/**
+ * Entity for time table.
+ *
+ * @author Alexandr Yefremov
+ */
 @Entity
 @Table(name = "time_table")
 public class TimeTable extends AuditableEntity {
@@ -22,14 +31,14 @@ public class TimeTable extends AuditableEntity {
     @Column(name = "base_price", nullable = false)
     private Short basePrice;
     @Type(type = "jsonb")
-    @Column(name = "closed_seats", columnDefinition = "jsonb")
-    private HashSet<Short> closedSeats;
+    @Column(name = "closed_seats", columnDefinition = "jsonb", nullable = false)
+    private final Set<Short> closedSeats;
     @Column(name = "sold", nullable = false)
     private Boolean isSold;
 
     {
         closedSeats = new HashSet<>();
-        isSold = Boolean.FALSE;
+        isSold = FALSE;
         basePrice = (short) 0;
     }
 
@@ -70,7 +79,15 @@ public class TimeTable extends AuditableEntity {
         return startSession;
     }
 
-    public void setStartSession(@NonNull LocalDateTime startSession) {
+    /**
+     * Sets start session.
+     *
+     * @param startSession when movie will start.
+     * @throws IllegalArgumentException if argument earlier then {@link LocalDateTime#now()}
+     */
+    public void setStartSession(@NonNull LocalDateTime startSession) throws IllegalArgumentException {
+        if (startSession.isBefore(LocalDateTime.now()))
+            throw new IllegalArgumentException("Start session must not be earlier then now");
         this.startSession = startSession;
     }
 
@@ -85,49 +102,85 @@ public class TimeTable extends AuditableEntity {
         this.basePrice = basePrice;
     }
 
-    public Boolean getSold() {
+    public Boolean getIsSold() {
         return isSold;
     }
 
-    public void setSold(Boolean sold) {
+    public void setIsSold(Boolean sold) {
         isSold = sold;
     }
 
-    public HashSet<Short> getClosedSeats() {
-        return closedSeats;
+    /**
+     * Return copy as unmodifiable set for reading only.
+     * To add new seats use {@link #addClosedSeats(Set)}
+     *
+     * @return unmodifiable set
+     * @throws UnsupportedOperationException if you try modify set
+     */
+    public Set<Short> getClosedSeats() throws UnsupportedOperationException {
+        return unmodifiableSet(closedSeats);
     }
 
     /**
-     * Adds closed seats to the existed, reduces duplicating the same seats numbers
+     * Adds booked seats to the existed and does some additional checks.
+     * Set isClosed to true if all seats are booked.
      *
      * @param arg will be added
-     * @return if everything went well
-     * @throws IllegalArgumentException if some seat is already closed
+     * @return true if everything went well
+     * @throws IllegalArgumentException if incoming collection is empty
+     *                                  or seat numbers are already booked,
+     *                                  or total amount of seats is greater then {@link CinemaHall#getSeatsAmount()},
+     *                                  or seat number is out of the range of the Cinema hall's seat numbers
      */
-    public boolean addClosedSeats(@NonNull HashSet<Short> arg) throws IllegalArgumentException {
-        // TODO: 10.09.2022  remove
-//        if (!closedSeats.isEmpty()) {
-//            arg.forEach(seat -> {
-//                if (closedSeats.contains(seat)) {
-//                    throw new IllegalArgumentException("seats.already.closed");
-//                }
-//            });
-        if (arg.stream().anyMatch(seat -> closedSeats.contains(seat))) {
+    public boolean addClosedSeats(@NonNull Set<Short> arg) throws IllegalArgumentException {
+        if (arg.isEmpty()) {
+            throw new IllegalArgumentException("Booked seats are empty");
+        }
+        if (closedSeats.size() + arg.size() > getCinemaHall().getSeatsAmount().intValue()) {
+            throw new IllegalArgumentException("Amount of the booked seats are greater then total amount of seats of the current cinema hall.");
+        }
+        if (arg.stream().anyMatch(closedSeats::contains)) {
             throw new IllegalArgumentException("seats.already.closed");
         }
-        return closedSeats.addAll(arg);
+        if (!cinemaHall.areSeatsRelatedToCurrentHall(arg)) {
+            throw new IllegalArgumentException("Booked seats are out of the range of the current cinema hall");
+        }
+        closedSeats.addAll(arg);
+        if (closedSeats.size() == cinemaHall.getSeatsAmount().intValue()) {
+            this.setIsSold(true);
+        }
+        return true;
+    }
+
+    /**
+     * Removes incoming seats from booked seats.
+     *
+     * @param seats seats
+     * @throws IllegalArgumentException if reserved seats do not contain all seats for cancelling
+     *                                  or argument is empty.
+     */
+    public void reopenClosedSeats(@NonNull Set<Short> seats) throws IllegalArgumentException {
+        if (seats.isEmpty()) {
+            throw new IllegalArgumentException("Seats for cancelling booking are empty");
+        }
+        if (!closedSeats.containsAll(seats)) {
+            throw new IllegalArgumentException("Seats for cancel booking are not contained in the current timetable");
+        }
+        seats.forEach(closedSeats::remove);
+        setIsSold(FALSE);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TimeTable timeTable)) return false;
+        if (!(o instanceof TimeTable)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(getMovie(), timeTable.getMovie()) && Objects.equals(getCinemaHall(), timeTable.getCinemaHall()) && Objects.equals(getStartSession(), timeTable.getStartSession()) && getBasePrice().equals(timeTable.getBasePrice()) && getClosedSeats().equals(timeTable.getClosedSeats()) && isSold.equals(timeTable.isSold);
+        TimeTable timeTable = (TimeTable) o;
+        return getMovie().equals(timeTable.getMovie()) && getCinemaHall().equals(timeTable.getCinemaHall()) && Objects.equals(getStartSession(), timeTable.getStartSession()) && Objects.equals(getBasePrice(), timeTable.getBasePrice()) && Objects.equals(getClosedSeats(), timeTable.getClosedSeats()) && getIsSold().equals(timeTable.getIsSold());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getMovie(), getCinemaHall(), getStartSession(), getBasePrice(), getClosedSeats(), isSold);
+        return Objects.hash(super.hashCode(), getMovie(), getCinemaHall(), getStartSession(), getBasePrice(), getClosedSeats(), getIsSold());
     }
 }
