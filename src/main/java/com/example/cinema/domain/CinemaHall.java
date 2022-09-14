@@ -6,11 +6,16 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static java.util.Collections.unmodifiableMap;
+
+/**
+ * Entity that represents cinema hall.
+ *
+ * @author Alexandr Yefremov
+ */
 @Entity
 @Table(name = "cinema_hall")
 public class CinemaHall extends AuditableEntity {
@@ -24,9 +29,13 @@ public class CinemaHall extends AuditableEntity {
     private Short seatsAmount;
     @Type(type = "jsonb")
     @Column(name = "seats_type", nullable = false, columnDefinition = "jsonb")
-    private EnumMap<SeatType, HashSet<Integer>> seatsType;
+    private Map<SeatType, HashSet<Short>> seatsType;
 
     public CinemaHall() {
+    }
+
+    public CinemaHall(Long id) {
+        super(id);
     }
 
     public CinemaHall(Long id, String name, Short seatsAmount) {
@@ -51,39 +60,91 @@ public class CinemaHall extends AuditableEntity {
         this.seatsAmount = seatsAmount;
     }
 
-    public EnumMap<SeatType, HashSet<Integer>> getSeatsType() {
-        return seatsType;
+    /**
+     * Returns unmodifiable map of the seat types. To add seats types use {@link CinemaHall#setSeatsType(Map)}
+     *
+     * @return unmodifiable
+     * @throws UnsupportedOperationException when try modify seats types
+     */
+    public Map<SeatType, HashSet<Short>> getSeatsType() throws UnsupportedOperationException {
+        return unmodifiableMap(seatsType);
     }
 
     /**
-     * Replaces old {@link #seatsType} with new one.
+     * Replaces old {@link #seatsType} with new one but does not add.
      * {@link #seatsAmount} must be not null
      *
      * @param seatsType new one
-     * @throws IllegalArgumentException if incoming amount of seats does not match {@link #seatsAmount} or they have duplicated seats numbers
+     * @throws IllegalArgumentException see {@link CinemaHall#validateSeats(Collection)}
      * @throws NullPointerException     if you try to set new {@link #seatsType} when {@link #seatsAmount} not set yet
      */
-    public void setSeatsType(EnumMap<SeatType, HashSet<Integer>> seatsType) throws IllegalArgumentException, NullPointerException {
+    public void setSeatsType(Map<SeatType, HashSet<Short>> seatsType) throws IllegalArgumentException, NullPointerException {
         Objects.requireNonNull(seatsAmount, "Seats amount must be not null");
+        if (seatsType.isEmpty()) {
+            throw new IllegalArgumentException("Seats amount must be not empty");
+        }
         validateSeats(seatsType.values());
         this.seatsType = seatsType;
     }
 
-    private void validateSeats(Collection<HashSet<Integer>> values) throws IllegalArgumentException {
-        final HashSet<Integer> hashSet = new HashSet<>(40);
-        values.forEach(hashSet::addAll);
-        int count = 0;
-        for (HashSet<Integer> number :
-                values) {
-            count += number.size();
-        }
-        if (hashSet.size() < count) {
+    /**
+     * Validate new seats before they will be added.
+     *
+     * @param values seat numbers
+     * @throws IllegalArgumentException if incoming amount of seats does not match {@link #seatsAmount} or they have duplicated seats numbers
+     */
+    private void validateSeats(Collection<HashSet<Short>> values) throws IllegalArgumentException {
+        final long countDist = values.stream()
+                .flatMap(Collection::stream)
+                .distinct()
+                .count();
+        final long countWithoutDist = values.stream()
+                .mapToLong(Collection::size)
+                .sum();
+        if (countDist != countWithoutDist) {
             throw new IllegalArgumentException("Seats type contains duplicate seats numbers");
         }
-        if (count != seatsAmount) {
+        if (countDist != seatsAmount) {
             throw new IllegalArgumentException(" Amount of seats transferred to set seats type, do not match the total amount of seats for current cinema hall.");
         }
+    }
 
+    /**
+     * Checks, if the candidates (numbers of seats) are within the range of the current cinema hall's seats.
+     *
+     * @param candidates numbers of seats
+     * @return true if the current cinema hall contains all such numbers (seats), otherwise false
+     * @throws IllegalArgumentException if candidates null or empty
+     */
+    public boolean areSeatsRelatedToCurrentHall(Set<Short> candidates) throws IllegalArgumentException {
+        if (candidates == null || candidates.isEmpty()) {
+            throw new IllegalArgumentException(" Candidates must be not null or not empty");
+        }
+        return candidates.stream()
+                .allMatch(candidate -> seatsType.values().stream().anyMatch(group -> group.contains(candidate)));
+    }
+
+
+    /**
+     * Returns {@link SeatType} by seat number.
+     *
+     * @param seatNumber seat number
+     * @return {@link SeatType}
+     * @throws IllegalStateException    if cinema hall contains duplicated seats or if seat type by number is not found
+     * @throws IllegalArgumentException if argument null or less then 1
+     */
+    public SeatType getSeatTypeBySeatNumber(Short seatNumber) throws IllegalStateException, IllegalArgumentException {
+        if (seatNumber == null || seatNumber < 1) {
+            throw new IllegalArgumentException("Invalid seat number");
+        }
+        final Set<SeatType> collect = getSeatsType().keySet()
+                .stream()
+                .filter(current -> getSeatsType().get(current).contains(seatNumber))
+                .collect(Collectors.toUnmodifiableSet());
+        if (collect.size() > 1) {
+            throw new IllegalStateException("Cinema hall contains duplicated seats");
+        }
+        return collect.stream().findFirst().orElseThrow(() -> new IllegalStateException("Seat type by  number not found"));
     }
 
     @Override
