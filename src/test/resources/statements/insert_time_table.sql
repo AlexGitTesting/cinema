@@ -216,5 +216,15 @@ values (1000, 1001, 100, CURRENT_DATE + interval '9' hour, 50, '[
          6,
          9,
          10
+       ]', false),
+
+
+       --for test only
+       (1030, 1000, 101, current_timestamp - interval '3' hour, 50, '[
+         2,
+         3,
+         6,
+         7,
+         10
        ]', false);
 

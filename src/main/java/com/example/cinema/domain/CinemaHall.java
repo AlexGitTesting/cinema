@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.example.cinema.core.ValidatorHelper.validateShort;
 import static java.util.Collections.unmodifiableMap;
 
 /**
@@ -134,9 +135,7 @@ public class CinemaHall extends AuditableEntity {
      * @throws IllegalArgumentException if argument null or less then 1
      */
     public SeatType getSeatTypeBySeatNumber(Short seatNumber) throws IllegalStateException, IllegalArgumentException {
-        if (seatNumber == null || seatNumber < 1) {
-            throw new IllegalArgumentException("Invalid seat number");
-        }
+        validateShort(seatNumber);
         final Set<SeatType> collect = getSeatsType().keySet()
                 .stream()
                 .filter(current -> getSeatsType().get(current).contains(seatNumber))
@@ -144,7 +143,7 @@ public class CinemaHall extends AuditableEntity {
         if (collect.size() > 1) {
             throw new IllegalStateException("Cinema hall contains duplicated seats");
         }
-        return collect.stream().findFirst().orElseThrow(() -> new IllegalStateException("Seat type by  number not found"));
+        return collect.stream().findFirst().orElseThrow(() -> new IllegalArgumentException("Seat type by  number not found"));
     }
 
     @Override

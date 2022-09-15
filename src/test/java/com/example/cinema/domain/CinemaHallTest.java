@@ -101,7 +101,7 @@ class CinemaHallTest {
     void getSeatTypeBySeatNumberNet() {
         final CinemaHall red = new CinemaHall(null, "White", (short) 20);
         red.setSeatsType(getSeatsTypes());
-        assertThrowsExactly(IllegalStateException.class, () -> red.getSeatTypeBySeatNumber((short) 24), "Seat type by  number not found");
+        assertThrowsExactly(IllegalArgumentException.class, () -> red.getSeatTypeBySeatNumber((short) 24), "Seat type by  number not found");
     }
 
     @Test
