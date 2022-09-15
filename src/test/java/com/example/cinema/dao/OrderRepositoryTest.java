@@ -2,11 +2,13 @@ package com.example.cinema.dao;
 
 import com.example.cinema.domain.OrderTable;
 import com.example.cinema.domain.TimeTable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Sql({
         "classpath:statements/insert_cinema_hall.sql",
@@ -30,11 +32,21 @@ class OrderRepositoryTest extends BaseDataJpaTest {
         final TimeTable timeTable = new TimeTable();
         timeTable.setId(1000L);
         final OrderTable orderTable = new OrderTable(null, timeTable, 555, "I'm");
-        Assertions.assertDoesNotThrow(() -> repository.saveAndFlush(orderTable));
+        assertDoesNotThrow(() -> repository.saveAndFlush(orderTable));
     }
 
     @Test
     @Transactional
     void findOrderTableById() {
+        final OrderTable orderTable = assertDoesNotThrow(() -> repository.findOrderTableById(106L).orElseThrow());
+        assertEquals(1004L, orderTable.getTimeTable().getId());
     }
+
+    @Test
+    @Transactional
+    void deleteOrder() {
+        repository.deleteById(106L);
+
+    }
+
 }

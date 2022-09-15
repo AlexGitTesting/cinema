@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,7 +74,7 @@ class OrderServiceTest {
                 .build();
 
         final IllegalArgumentException orderSaved = assertThrowsExactly(IllegalArgumentException.class, () -> orderService.createOrder(order));
-        assertEquals("You can not create order for movie that has already started", orderSaved.getMessage());
+        assertEquals("You can not saveOrder order for movie that has already started", orderSaved.getMessage());
 
     }
 
@@ -147,9 +148,17 @@ class OrderServiceTest {
 
     @Test
     void deleteOrder() {
+        final Boolean del = assertDoesNotThrow(() -> orderService.deleteOrder(137L));
+        assertTrue(del);
+        assertThrowsExactly(NoSuchElementException.class, () -> tableService.getByIdOptionalLazy(137L).orElseThrow());
+
+
     }
 
     @Test
     void getById() {
+        final OrderDto byId = orderService.getById(137L);
+        assertEquals(1022L, byId.getTimeTableId());
+
     }
 }

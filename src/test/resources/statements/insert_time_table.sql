@@ -158,12 +158,17 @@ values (1000, 1001, 100, CURRENT_DATE + interval '9' hour, 50, '[
          4
        ]', false),
        (1022, 1004, 100, CURRENT_DATE + interval '2 day' + time ' 12:10:00', 75, '[
+         1,
+         2,
          3,
          4,
+         5,
          6,
+         7,
+         8,
          9,
          10
-       ]', false),
+       ]', true),
        (1023, 1001, 101, CURRENT_DATE + interval '2 day' + time ' 12:30:00', 75, '[
          1,
          2,
