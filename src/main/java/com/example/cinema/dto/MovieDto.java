@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
+
 @JsonDeserialize(builder = MovieDto.Builder.class)
 public class MovieDto implements Serializable {
     @Serial
@@ -41,26 +43,25 @@ public class MovieDto implements Serializable {
     }
 
     public Optional<Long> getId() {
-        return Optional.ofNullable(id);
+        return ofNullable(id);
     }
 
-    public String getTitle() {
-        return title;
+    public Optional<String> getTitle() {
+        return ofNullable(title);
     }
 
-    public Short getTiming() {
-        return timing;
+    public Optional<Short> getTiming() {
+        return ofNullable(timing);
     }
 
-    public String getProducer() {
-        return producer;
+    public Optional<String> getProducer() {
+        return ofNullable(producer);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MovieDto)) return false;
-        MovieDto movieDto = (MovieDto) o;
+        if (!(o instanceof MovieDto movieDto)) return false;
         return Objects.equals(getId(), movieDto.getId()) && Objects.equals(getTitle(), movieDto.getTitle()) && Objects.equals(getTiming(), movieDto.getTiming()) && Objects.equals(getProducer(), movieDto.getProducer());
     }
 

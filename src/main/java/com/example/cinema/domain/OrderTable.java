@@ -6,6 +6,7 @@ import org.springframework.lang.NonNull;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -54,8 +55,8 @@ public class OrderTable extends AuditableEntity {
         this.timeTable = timeTable;
     }
 
-    public Integer getOrderPrice() {
-        return orderPrice;
+    public Optional<Integer> getOrderPrice() {
+        return Optional.ofNullable(orderPrice);
     }
 
     public void setOrderPrice(@NonNull Integer orderPrice) {
@@ -66,7 +67,7 @@ public class OrderTable extends AuditableEntity {
         return seats;
     }
 
-    public void setSeats(@NonNull HashSet<Short> seats) {
+    public void setSeats(@NonNull Set<Short> seats) {
         this.seats.addAll(seats);
     }
 

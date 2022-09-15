@@ -4,6 +4,7 @@ import com.example.cinema.domain.Movie_;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.domain.TimeTable_;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.criteria.Predicate;
@@ -12,16 +13,25 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of {@link TimeTableSpecification}.
+ *
+ * @author Alexandr Yefremov
+ */
 @Component
 public class TimeTableSpecificationImpl implements TimeTableSpecification {
     @Override
-    public Specification<TimeTable> getByFilter(TimeTableQueryFilter filter) {
+    public Specification<TimeTable> getByFilter(@NonNull TimeTableQueryFilter filter) {
         return ((root, query, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            query.orderBy(cb.asc(root.get(TimeTable_.movie).get(Movie_.id)));
+            query.orderBy(cb.asc(root.get(TimeTable_.startSession)));
+            if (!query.getResultType().equals(Long.class)) {
+                root.fetch(TimeTable_.movie);
+                root.fetch(TimeTable_.cinemaHall);
+            }
             filter.getMovieId().ifPresent(id -> predicates.add(cb.equal(root.get(TimeTable_.movie).get(Movie_.id), id)));
             filter.getDateSession().ifPresentOrElse(localDate -> {
-                        final LocalDateTime before = localDate.isEqual(LocalDate.now())
+                        final LocalDateTime before = localDate.isEqual(LocalDate.now()) || localDate.isBefore(LocalDate.now())
                                 ? LocalDateTime.now()
                                 : localDate.atTime(0, 0, 1);
 

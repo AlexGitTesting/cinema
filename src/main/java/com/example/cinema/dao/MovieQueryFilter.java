@@ -10,7 +10,7 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 
 /**
- * Filter for query movies.
+ * Filter for querying movies.
  *
  * @author Alexandr Yefremov
  */

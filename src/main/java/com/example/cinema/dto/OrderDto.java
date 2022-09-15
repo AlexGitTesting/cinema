@@ -5,15 +5,12 @@ import com.example.cinema.core.RequiredFieldsForUpdating;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -28,11 +25,11 @@ public class OrderDto implements Serializable {
     @NotNull(groups = RequiredFieldsForUpdating.class, message = "some.problems")
     @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "some.problems")
     private final Long timeTableId;
-    @NotNull(groups = RequiredFieldsForUpdating.class, message = "some.problems")
-    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "some.problems")
+    @Null(groups = RequiredFieldsForCreation.class, message = "some.problems")
     private final Integer orderPrice;
     @NotNull(message = "some.problems")
-    private final HashSet<Short> seats;
+    @NotEmpty(message = "some.problems")
+    private final Set<Short> seats;
     @NotBlank(message = "some.problems")
     private final String customer;
 
@@ -56,11 +53,11 @@ public class OrderDto implements Serializable {
         return timeTableId;
     }
 
-    public Integer getOrderPrice() {
-        return orderPrice;
+    public Optional<Integer> getOrderPrice() {
+        return ofNullable(orderPrice);
     }
 
-    public HashSet<Short> getSeats() {
+    public Set<Short> getSeats() {
         return seats;
     }
 
@@ -71,8 +68,7 @@ public class OrderDto implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OrderDto)) return false;
-        OrderDto orderDto = (OrderDto) o;
+        if (!(o instanceof OrderDto orderDto)) return false;
         return Objects.equals(getId(), orderDto.getId()) && Objects.equals(getTimeTableId(), orderDto.getTimeTableId()) && Objects.equals(getOrderPrice(), orderDto.getOrderPrice()) && Objects.equals(getSeats(), orderDto.getSeats()) && Objects.equals(getCustomer(), orderDto.getCustomer());
     }
 
@@ -86,7 +82,7 @@ public class OrderDto implements Serializable {
         private Long id;
         private Long timeTableId;
         private Integer orderPrice;
-        private HashSet<Short> seats;
+        private Set<Short> seats;
         private String customer;
 
         public OrderDto build() {
@@ -108,7 +104,7 @@ public class OrderDto implements Serializable {
             return this;
         }
 
-        public OrderDto.Builder seats(final HashSet<Short> seats) {
+        public OrderDto.Builder seats(final Set<Short> seats) {
             this.seats = seats;
             return this;
         }
