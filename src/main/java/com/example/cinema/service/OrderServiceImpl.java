@@ -79,6 +79,9 @@ public class OrderServiceImpl implements OrderService {
     public boolean deleteOrder(Long id) {
         ValidatorHelper.validateLong(id);
         final OrderTable order = repository.findOrderTableById(id).orElseThrow(() -> new EntityNotFoundException("Order by id not found"));
+        if (order.getTimeTable().getStartSession().isBefore(LocalDateTime.now())) {
+            return false;
+        }
         if (!order.getSeats().isEmpty()) {
             order.getTimeTable().reopenClosedSeats(order.getSeats());
         }

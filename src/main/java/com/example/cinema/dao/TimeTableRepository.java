@@ -52,4 +52,9 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long>, Jpa
     @Query("select case when count(t.id)>0 then true else false end from" +
             " #{#entityName} as t where t.startSession>current_timestamp and t.cinemaHall.id=:id")
     boolean ifTimeTableExistsByCinemaHallIdFuture(Long id);
+
+    @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
+    @Query("select case when count(t.id)>0 then true else false end from" +
+            " #{#entityName} as t where t.startSession>current_timestamp and t.movie.id=:id")
+    boolean ifTimeTableExistsByMovieIdInFuture(Long id);
 }
