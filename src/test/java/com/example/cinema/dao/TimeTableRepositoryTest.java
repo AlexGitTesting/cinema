@@ -1,9 +1,12 @@
 package com.example.cinema.dao;
 
+import com.example.cinema.core.SeatType;
 import com.example.cinema.domain.CinemaHall;
 import com.example.cinema.domain.Movie;
 import com.example.cinema.domain.TimeTable;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +15,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
         "classpath:statements/truncate_cinema_hall.sql"
 })
 class TimeTableRepositoryTest extends BaseDataJpaTest {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private TimeTableRepository repository;
     @PersistenceContext
@@ -61,7 +66,7 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     void getByFilter() {
         final long movieId = 1001L;
         final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
-                .dateSession(LocalDate.now())
+                .dateSession(LocalDate.now().plusDays(1L))
                 .movieId(movieId).build();
         final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
         assertFalse(all.isEmpty());
@@ -84,12 +89,54 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     @Test
     @Transactional
     void save() {
-        final TimeTable timeTable = new TimeTable(null, new Movie(1000L, "title", (short) 56, "prod"), new CinemaHall(100L, "name", (short) 45), LocalDateTime.now(), (short) 75, false);
-        timeTable.getClosedSeats().add((short) 1);
-        timeTable.getClosedSeats().add((short) 3);
-        timeTable.getClosedSeats().add((short) 5);
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        final CinemaHall cinemaHall = new CinemaHall(100L, "g", (short) 10);
+        cinemaHall.setSeatsType(seatsType);
+        final TimeTable timeTable = new TimeTable(null, new Movie(1000L, "title", (short) 56, "prod"), cinemaHall, LocalDateTime.now(), (short) 75, false);
+        timeTable.addClosedSeats(Set.of((short) 3, (short) 1, (short) 5));
         repository.save(timeTable);
     }
 
+    @Test
+    @Transactional
+    void updateIsClosedTrue() {
+        final TimeTable timeTable = assertDoesNotThrow(() -> repository.getTimeTableByIdEager(1015L).orElseThrow());
+        final Set<Short> args = Set.of((short) 1, (short) 2, (short) 4, (short) 5);
+        timeTable.addClosedSeats(args);
+        final TimeTable timeTable1 = assertDoesNotThrow(() -> repository.saveAndFlush(timeTable));
+        entityManager.persist(timeTable1);
+        entityManager.flush();
+        assertTrue(timeTable1.getClosedSeats().containsAll(args));
+        assertTrue(timeTable1.getIsSold());
+    }
 
+    @Test
+    @Transactional
+    void getTimeTableByIdEager() {
+        final TimeTable timeTable = assertDoesNotThrow(() -> repository.getTimeTableByIdEager(1015L).orElseThrow());
+    }
+
+    @Test
+    @Transactional
+    void ifTimeTableExistsByCinemaHallIdAndStartEarlier() {
+        final boolean b = repository.ifTimeTableExistsByCinemaHallIdLegacy(100L);
+        assertTrue(b);
+        final boolean c = repository.ifTimeTableExistsByCinemaHallIdLegacy(1L);
+        assertFalse(c);
+    }
+
+    @Test
+    @Transactional
+    void getByFilterOld() {
+        final long movieId = 1001L;
+        final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
+                .dateSession(LocalDate.now()).build();
+        final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+        final Set<TimeTable> collect = all.stream().filter(a -> a.getStartSession().isBefore(LocalDateTime.now())).collect(Collectors.toSet());
+        collect.forEach(g -> log.info(g.toString()));
+
+    }
 }

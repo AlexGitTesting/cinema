@@ -183,4 +183,16 @@ public class TimeTable extends AuditableEntity {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getMovie(), getCinemaHall(), getStartSession(), getBasePrice(), getClosedSeats(), getIsSold());
     }
+
+    @Override
+    public String toString() {
+        return "TimeTable{" +
+                "movie=" + movie +
+                ", cinemaHall=" + cinemaHall +
+                ", startSession=" + startSession +
+                ", basePrice=" + basePrice +
+                ", closedSeats=" + closedSeats +
+                ", isSold=" + isSold +
+                '}';
+    }
 }
