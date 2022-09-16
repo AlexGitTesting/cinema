@@ -87,7 +87,7 @@ public class TimeTable extends AuditableEntity {
      */
     public void setStartSession(@NonNull LocalDateTime startSession) throws IllegalArgumentException {
         if (startSession.isBefore(LocalDateTime.now()))
-            throw new IllegalArgumentException("Start session must not be earlier then now");
+            throw new IllegalArgumentException("start.session.not.correct");
         this.startSession = startSession;
     }
 
@@ -95,9 +95,15 @@ public class TimeTable extends AuditableEntity {
         return basePrice;
     }
 
-    public void setBasePrice(@NonNull Short basePrice) {
+    /**
+     * Sets base price for the ticket
+     *
+     * @param basePrice price
+     * @throws IllegalArgumentException if price less then zero
+     */
+    public void setBasePrice(@NonNull Short basePrice) throws IllegalArgumentException {
         if (basePrice < 0) {
-            throw new IllegalArgumentException("seats.already.closed");
+            throw new IllegalArgumentException("base.price.incorrect");
         }
         this.basePrice = basePrice;
     }

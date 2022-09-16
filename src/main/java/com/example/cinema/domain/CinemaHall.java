@@ -64,7 +64,7 @@ public class CinemaHall extends AuditableEntity {
     /**
      * Returns unmodifiable map of the seat types. To add seats types use {@link CinemaHall#setSeatsType(Map)}
      *
-     * @return unmodifiable
+     * @return unmodifiable collection
      * @throws UnsupportedOperationException when try modify seats types
      */
     public Map<SeatType, HashSet<Short>> getSeatsType() throws UnsupportedOperationException {
@@ -80,9 +80,9 @@ public class CinemaHall extends AuditableEntity {
      * @throws NullPointerException     if you try to set new {@link #seatsType} when {@link #seatsAmount} not set yet
      */
     public void setSeatsType(Map<SeatType, HashSet<Short>> seatsType) throws IllegalArgumentException, NullPointerException {
-        Objects.requireNonNull(seatsAmount, "Seats amount must be not null");
+        Objects.requireNonNull(seatsAmount, "seats.must.not.empty");
         if (seatsType.isEmpty()) {
-            throw new IllegalArgumentException("Seats amount must be not empty");
+            throw new IllegalArgumentException("seats.must.not.empty");
         }
         validateSeats(seatsType.values());
         this.seatsType = seatsType;
@@ -103,10 +103,10 @@ public class CinemaHall extends AuditableEntity {
                 .mapToLong(Collection::size)
                 .sum();
         if (countDist != countWithoutDist) {
-            throw new IllegalArgumentException("Seats type contains duplicate seats numbers");
+            throw new IllegalArgumentException("seats.contain.duplicates");
         }
         if (countDist != seatsAmount) {
-            throw new IllegalArgumentException(" Amount of seats transferred to set seats type, do not match the total amount of seats for current cinema hall.");
+            throw new IllegalArgumentException("seats.not.match.total.amount");
         }
     }
 
@@ -119,7 +119,7 @@ public class CinemaHall extends AuditableEntity {
      */
     public boolean areSeatsRelatedToCurrentHall(Set<Short> candidates) throws IllegalArgumentException {
         if (candidates == null || candidates.isEmpty()) {
-            throw new IllegalArgumentException(" Candidates must be not null or not empty");
+            throw new IllegalArgumentException(" field.error.empty.collection");
         }
         return candidates.stream()
                 .allMatch(candidate -> seatsType.values().stream().anyMatch(group -> group.contains(candidate)));
@@ -141,7 +141,7 @@ public class CinemaHall extends AuditableEntity {
                 .filter(current -> getSeatsType().get(current).contains(seatNumber))
                 .collect(Collectors.toUnmodifiableSet());
         if (collect.size() > 1) {
-            throw new IllegalStateException("Cinema hall contains duplicated seats");
+            throw new IllegalStateException("seats.contain.duplicates");
         }
         return collect.stream().findFirst().orElseThrow(() -> new IllegalArgumentException("Seat type by  number not found"));
     }

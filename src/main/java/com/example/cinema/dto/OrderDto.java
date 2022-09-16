@@ -2,6 +2,7 @@ package com.example.cinema.dto;
 
 import com.example.cinema.core.RequiredFieldsForCreation;
 import com.example.cinema.core.RequiredFieldsForUpdating;
+import com.example.cinema.domain.OrderTable;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
@@ -14,23 +15,27 @@ import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Represents DTO of {@link OrderTable}.
+ *
+ * @author Alexandr Yefremov
+ */
 @JsonDeserialize(builder = OrderDto.Builder.class)
 public class OrderDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 42L;
-    @Null(groups = RequiredFieldsForCreation.class, message = "some.problems")
-    @NotNull(groups = RequiredFieldsForUpdating.class, message = "some.problems")
-    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "some.problems")
+    @Null(groups = RequiredFieldsForCreation.class, message = "field.error.null")
+    @NotNull(groups = RequiredFieldsForUpdating.class, message = "field.error.not.null")
+    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "field.error.min._1")
     private final Long id;
-    @NotNull(groups = RequiredFieldsForUpdating.class, message = "some.problems")
-    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "some.problems")
+    @NotNull(groups = RequiredFieldsForUpdating.class, message = "field.error.not.null")
+    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "field.error.min._1")
     private final Long timeTableId;
-    @Null(groups = RequiredFieldsForCreation.class, message = "some.problems")
+    @Null(groups = RequiredFieldsForCreation.class, message = "field.error.null")
     private final Integer orderPrice;
-    @NotNull(message = "some.problems")
-    @NotEmpty(message = "some.problems")
+    @NotEmpty(message = "field.error.empty.collection")
     private final Set<Short> seats;
-    @NotBlank(message = "some.problems")
+    @NotBlank(message = "field.error.empty.collection")
     private final String customer;
 
     private OrderDto(Builder builder) {

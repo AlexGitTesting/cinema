@@ -6,6 +6,11 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entity that represents movie table.
+ *
+ * @author Alexandr Yefremov
+ */
 @Entity
 @Table(name = "movie")
 public class Movie extends AuditableEntity {
@@ -17,6 +22,10 @@ public class Movie extends AuditableEntity {
     private String producer;
 
     public Movie() {
+    }
+
+    public Movie(Long id) {
+        super(id);
     }
 
     public Movie(Long id, String title, Short timing, String producer) {

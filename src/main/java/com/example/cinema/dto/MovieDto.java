@@ -2,6 +2,7 @@ package com.example.cinema.dto;
 
 import com.example.cinema.core.RequiredFieldsForCreation;
 import com.example.cinema.core.RequiredFieldsForUpdating;
+import com.example.cinema.domain.Movie;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
@@ -13,21 +14,27 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Represent DTO of {@link Movie}.
+ *
+ * @author Alexandr Yefremov
+ */
 @JsonDeserialize(builder = MovieDto.Builder.class)
 public class MovieDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 42L;
-    @Null(groups = RequiredFieldsForCreation.class, message = "some.problems") // TODO: 12.09.2022 fix
-    @NotNull(groups = RequiredFieldsForUpdating.class, message = "some.problems")
-    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "some.problems")
+    @Null(groups = RequiredFieldsForCreation.class, message = "field.error.null")
+    @NotNull(groups = RequiredFieldsForUpdating.class, message = "field.error.not.null")
+    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "field.error.min._1")
     private final Long id;
-    @NotBlank(message = "some.problems")
-    @Size(max = 20, min = 1, message = "some.problems")
+    @NotBlank(message = "field.error.blank")
+    @Size(max = 20, message = "field.error.size.incorrect")
     private final String title;
-    @NotNull(message = "some.problems")
+    @NotNull(message = "field.error.not.null")
+    @Min(value = 1, message = "field.error.min._1")
     private final Short timing;
-    @NotBlank(message = "some.problems")
-    @Size(max = 20, min = 1, message = "some.problems")
+    @NotBlank(message = "field.error.blank")
+    @Size(max = 20, message = "field.error.size.incorrect")
     private final String producer;
 
     private MovieDto(Builder builder) {
