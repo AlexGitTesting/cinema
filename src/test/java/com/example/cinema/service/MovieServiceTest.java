@@ -1,5 +1,6 @@
 package com.example.cinema.service;
 
+import com.example.cinema.core.ValidationCustomException;
 import com.example.cinema.dao.MovieQueryFilter;
 import com.example.cinema.dto.MovieDto;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void getByIdFount() {
+    void getByIdFound() {
         final MovieDto dto = assertDoesNotThrow(() -> service.getById(1004L));
         assertEquals("Dark of the Moon", dto.getTitle().orElseThrow());
         assertEquals("Nelson Shin", dto.getProducer().orElseThrow());
@@ -61,7 +62,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void getByIdNotFount() {
+    void getByIdNotFound() {
         assertThrows(EntityNotFoundException.class, () -> service.getById(2005L));
     }
 
@@ -87,7 +88,7 @@ class MovieServiceTest {
                 .title("Go to California")
                 .timing((short) 15)
                 .build();
-        assertThrowsExactly(IllegalArgumentException.class, () -> service.update(dto), "Movie dto does not contain id");
+        assertThrowsExactly(ValidationCustomException.class, () -> service.update(dto));
     }
 
     @Test

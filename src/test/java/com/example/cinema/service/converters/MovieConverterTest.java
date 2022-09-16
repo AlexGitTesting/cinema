@@ -36,10 +36,10 @@ class MovieConverterTest {
         short timing = 55;
         String producer = "producer";
         final MovieDto dto = MovieDto.builder().id(id).title(title).timing(timing).producer(producer).build();
-        final Movie d = converter.toDomain(dto);
-        assertEquals(id, d.getId());
-        assertEquals(timing, d.getTiming());
-        assertEquals(title, d.getTitle());
-        assertEquals(producer, d.getProducer());
+        final Movie domain = converter.toDomain(dto);
+        assertEquals(id, domain.getId());
+        assertEquals(timing, domain.getTiming());
+        assertEquals(title, domain.getTitle());
+        assertEquals(producer, domain.getProducer());
     }
 }

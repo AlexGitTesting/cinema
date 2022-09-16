@@ -1,5 +1,6 @@
 package com.example.cinema.service;
 
+import com.example.cinema.core.ValidationCustomException;
 import com.example.cinema.dao.MovieQueryFilter;
 import com.example.cinema.domain.Movie;
 import com.example.cinema.dto.MovieDto;
@@ -46,10 +47,10 @@ public interface MovieService {
      *
      * @param dto {@link MovieDto}
      * @return updated movie
-     * @throws EntityNotFoundException  if movie not fount
-     * @throws IllegalArgumentException if dto does not contain id, it is incorrect
+     * @throws EntityNotFoundException   if movie not fount
+     * @throws ValidationCustomException if dto is invalid
      */
-    MovieDto update(MovieDto dto) throws EntityNotFoundException, IllegalArgumentException;
+    MovieDto update(MovieDto dto) throws EntityNotFoundException, ValidationCustomException;
 
     /**
      * Removes movie by id, if there are not timetables that are referring to this one
