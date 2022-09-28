@@ -18,6 +18,11 @@ public interface ValidatorHelper {
         if (!StringUtils.hasLength(s)) throw new IllegalArgumentException("Argument is invalid");
     }
 
+    /**
+     * Validate parameter
+     *
+     * @param id not null and greater then 0
+     */
     static void validateParam(Long id) {
         if (id == null || id < 1)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id, must be not null and greater then 0");

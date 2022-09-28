@@ -1,5 +1,6 @@
 package com.example.cinema.dto;
 
+import com.example.cinema.core.DtoMarker;
 import com.example.cinema.core.RequiredFieldsForCreation;
 import com.example.cinema.core.RequiredFieldsForUpdating;
 import com.example.cinema.domain.Movie;
@@ -20,7 +21,7 @@ import static java.util.Optional.ofNullable;
  * @author Alexandr Yefremov
  */
 @JsonDeserialize(builder = MovieDto.Builder.class)
-public class MovieDto implements Serializable {
+public class MovieDto implements Serializable, DtoMarker {
     @Serial
     private static final long serialVersionUID = 42L;
     @Null(groups = RequiredFieldsForCreation.class, message = "field.error.null")

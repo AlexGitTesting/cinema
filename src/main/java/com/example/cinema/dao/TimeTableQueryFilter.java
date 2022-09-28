@@ -1,5 +1,6 @@
 package com.example.cinema.dao;
 
+import com.example.cinema.core.FilterMarker;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
@@ -11,7 +12,7 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 
 @JsonDeserialize(builder = TimeTableQueryFilter.Builder.class)
-public final class TimeTableQueryFilter implements Serializable {
+public final class TimeTableQueryFilter implements Serializable, FilterMarker {
     private final Integer page;
     private final Integer limit;
     private final LocalDate dateSession;

@@ -1,5 +1,6 @@
 package com.example.cinema.web;
 
+import com.example.cinema.config.ProjectProperties;
 import com.example.cinema.dao.MovieQueryFilter;
 import com.example.cinema.dto.MovieDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,8 @@ class MovieControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ProjectProperties prop;
 
     @Test
     void create() throws Exception {
@@ -45,7 +48,7 @@ class MovieControllerTest {
                 .title("Go to California")
                 .timing((short) 15)
                 .build();
-        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(b + "/create.json")
+        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getMovie() + "" + prop.getCreate())
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto));
@@ -60,7 +63,7 @@ class MovieControllerTest {
                 .title("Go to California")
                 .timing((short) 15)
                 .build();
-        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(b + "/create.json")
+        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getMovie() + "" + prop.getCreate())
                 .locale(new Locale("uk"))
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
@@ -71,7 +74,7 @@ class MovieControllerTest {
 
     @Test
     void getById() throws Exception {
-        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(b + "/{id}/get-movie.json", 1004)
+        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getMovie() + "" + prop.getGetById(), 1004)
                 .locale(new Locale("uk"))
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE);
@@ -83,7 +86,7 @@ class MovieControllerTest {
 
     @Test
     void getByIdNotValidParam() throws Exception {
-        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(b + "/{id}/get-movie.json", -2)
+        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getMovie() + "" + prop.getGetById(), -2)
                 .locale(new Locale("uk"))
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE);
@@ -101,7 +104,7 @@ class MovieControllerTest {
                 .timing((short) 15)
                 .id(1005L)
                 .build();
-        final MockHttpServletRequestBuilder patch = MockMvcRequestBuilders.patch(b + "/update.json")
+        final MockHttpServletRequestBuilder patch = MockMvcRequestBuilders.patch(prop.getBase().getMovie() + "" + prop.getUpdate())
                 .content(objectMapper.writeValueAsString(dto))
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE);
@@ -116,29 +119,28 @@ class MovieControllerTest {
                 .timing((short) 15)
                 .id(1005L)
                 .build();
-        final MockHttpServletRequestBuilder patch = MockMvcRequestBuilders.patch(b + "/update.json")
+        final MockHttpServletRequestBuilder patch = MockMvcRequestBuilders.patch(prop.getBase().getMovie() + "" + prop.getUpdate())
                 .content(objectMapper.writeValueAsString(dto))
                 .locale(new Locale("uk"))
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE);
-        mockMvc.perform(patch).andDo(print()).andExpect(status().isOk());
+        mockMvc.perform(patch).andDo(print()).andExpect(status().isBadRequest());
     }
 
     @Test
     void getByFilter() throws Exception {
         final MovieQueryFilter of = MovieQueryFilter.builder().limit(10).page(0).title("of").build();
-        final MockHttpServletRequestBuilder accept = MockMvcRequestBuilders.post(b + "/filter.json")
+        final MockHttpServletRequestBuilder accept = MockMvcRequestBuilders.post(prop.getBase().getMovie() + "" + prop.getGetByFilter())
                 .content(objectMapper.writeValueAsString(of))
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE);
         mockMvc.perform(accept).andDo(print()).andExpect(status().isOk());
     }
 
+
     @Test
     void delete() throws Exception {
-        final MockHttpServletRequestBuilder biuld = MockMvcRequestBuilders.delete(b + "/{id}/delete.json", 1005)
-                .accept(APPLICATION_JSON_VALUE)
-                .contentType(APPLICATION_JSON_VALUE);
+        final MockHttpServletRequestBuilder biuld = MockMvcRequestBuilders.delete(prop.getBase().getMovie() + "" + prop.getDelete(), 1005);
         mockMvc.perform(biuld).andDo(print()).andExpect(status().isOk());
     }
 }

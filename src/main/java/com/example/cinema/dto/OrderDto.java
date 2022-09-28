@@ -1,5 +1,6 @@
 package com.example.cinema.dto;
 
+import com.example.cinema.core.DtoMarker;
 import com.example.cinema.domain.OrderTable;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -19,7 +20,7 @@ import static java.util.Optional.ofNullable;
  * @author Alexandr Yefremov
  */
 @JsonDeserialize(builder = OrderDto.Builder.class)
-public class OrderDto implements Serializable {
+public class OrderDto implements Serializable, DtoMarker {
     @Serial
     private static final long serialVersionUID = 42L;
     @Null(message = "field.error.null")

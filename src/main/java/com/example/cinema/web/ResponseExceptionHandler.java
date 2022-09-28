@@ -32,6 +32,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageSource messageSource;
     @Resource
     protected WebRequest request;
+
     private MessageSourceAccessor messageSourceAccessor;
     private Logger log = LoggerFactory.getLogger(ResponseExceptionHandler.class);
 
@@ -66,7 +67,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         for (Map.Entry<String, String> entry :
                 messageMap.entrySet()) {
             final Locale locale = request.getLocale();
-            message.append(format("Field: %s  message: %s, \n", entry.getKey(),
+            message.append(format("Field: %s,  message: %s, \n", entry.getKey(),
                     getMessageSourceAccessor().getMessage(entry.getValue(), e.getMessage(), locale)));
         }
         return message.toString();

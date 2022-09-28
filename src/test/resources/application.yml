@@ -30,3 +30,15 @@ logging:
     root: info
     web: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+url:
+  base:
+    order: /order
+    movie: /movie
+    cinema_hall: /ciname_hall
+    time_table: /time_table
+  create: /create.json
+  get-by-id: /{id}/get.json
+  update: /update.json
+  get-by-filter: /filter.json
+  delete: /{id}/delete.json

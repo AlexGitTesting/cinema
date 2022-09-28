@@ -1,5 +1,6 @@
 package com.example.cinema.dao;
 
+import com.example.cinema.core.FilterMarker;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
@@ -15,7 +16,7 @@ import static java.util.Optional.ofNullable;
  * @author Alexandr Yefremov
  */
 @JsonDeserialize(builder = MovieQueryFilter.Builder.class)
-public class MovieQueryFilter implements Serializable {
+public class MovieQueryFilter implements Serializable, FilterMarker {
     private final Integer page;
     private final Integer limit;
     private final boolean sortingAscending;

@@ -38,7 +38,7 @@ class ValidationServiceTest {
     }
 
     @Test
-    void validateBasisTimeTableIncompatibleValues() {
+    void validateBasisTimeTableIncompatibleValues() {// TODO: 28.09.2022 fix problem
         final BasisTimeTable nulls = new BasisTimeTable(-1L, 0L, LocalDateTime.now(), (short) -3);
         final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(nulls, BasisTimeTable.class.getSimpleName()));
         final Map<String, String> map = ex.getMessageMap();
