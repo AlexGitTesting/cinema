@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,7 +62,8 @@ class ValidationServiceTest {
 
     @Test
     void validationCinemaHallIncorrectFields() {
-        final CinemaHallDto cinema = new CinemaHallDto(-1L, "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj", (short) 0, new EnumMap(SeatType.class));
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        final CinemaHallDto cinema = new CinemaHallDto(-1L, "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj", (short) 0, seatsType);
         final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName()));
         final Map<String, String> map = ex.getMessageMap();
         assertTrue(map.containsValue("field.error.min._1"));
