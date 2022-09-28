@@ -46,8 +46,36 @@ class CinemaHallServiceTest {
     }
 
     @Test
+    void createCinemaHallIncorrectSeatsAmount() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        String name = "name";
+        short amount = 11;
+        final CinemaHallDto dto = new CinemaHallDto(null, name, amount, seatsType);
+        final IllegalArgumentException exception = assertThrowsExactly(IllegalArgumentException.class, () -> service.createCinemaHall(dto));
+        assertEquals("seats.not.match.total.amount", exception.getMessage());
+
+    }
+
+    @Test
+    void createCinemaHallSeatsContainsDuplicatedSeatsNumbers() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 4)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        String name = "name";
+        short amount = 11;
+        final CinemaHallDto dto = new CinemaHallDto(null, name, amount, seatsType);
+        final IllegalArgumentException exception = assertThrowsExactly(IllegalArgumentException.class, () -> service.createCinemaHall(dto));
+        assertEquals("seats.contain.duplicates", exception.getMessage());
+
+    }
+
+    @Test
     void readById() {
-        final CinemaHallDto cinemaHallDto = service.readById(101L);
+        final CinemaHallDto cinemaHallDto = assertDoesNotThrow(() -> service.readById(101L));
         assertEquals(101L, cinemaHallDto.id());
         assertEquals("YELLOW", cinemaHallDto.name());
         assertEquals((short) 12, cinemaHallDto.seatsAmount());

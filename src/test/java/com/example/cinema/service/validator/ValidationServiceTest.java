@@ -35,7 +35,7 @@ class ValidationServiceTest {
     }
 
     @Test
-    void validateBasisTimeTableIncompatibleValues() {// TODO: 28.09.2022 fix problem
+    void validateBasisTimeTableIncompatibleValues() {
         final BasisTimeTable nulls = new BasisTimeTable(-1L, 0L, LocalDateTime.now(), (short) -3);
         final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(nulls, BasisTimeTable.class.getSimpleName()));
         final Map<String, String> map = ex.getMessageMap();
@@ -47,17 +47,78 @@ class ValidationServiceTest {
     }
 
     @Test
-    void validationCinemaHallNulls() {
+    void validationCinemaHallCreation() {
         final CinemaHallDto cinema = new CinemaHallDto(null, null, null, null);
-        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName()));
+        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName(), RequiredFieldsForCreation.class));
         final Map<String, String> map = ex.getMessageMap();
         assertTrue(map.containsValue("field.error.not.null"));
         assertTrue(map.containsValue("field.error.blank"));
         assertTrue(map.containsValue("field.error.empty.collection"));
-        assertTrue(map.containsKey("id"));
+        assertFalse(map.containsKey("id"));
         assertTrue(map.containsKey("name"));
         assertTrue(map.containsKey("seatsAmount"));
         assertTrue(map.containsKey("seatsType"));
+    }
+
+    @Test
+    void validationCinemaHallCreationNameBlankSeatsEmpty() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        final CinemaHallDto cinema = new CinemaHallDto(null, "  ", (short) 5, seatsType);
+        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName(), RequiredFieldsForCreation.class));
+        final Map<String, String> map = ex.getMessageMap();
+        assertTrue(map.containsValue("field.error.blank"));
+        assertTrue(map.containsValue("field.error.empty.collection"));
+        assertTrue(map.containsKey("name"));
+        assertTrue(map.containsKey("seatsType"));
+        assertEquals("field.error.blank", map.get("name"));
+        assertEquals("field.error.empty.collection", map.get("seatsType"));
+    }
+
+    @Test
+    void validationCinemaHallCreationIdNotNull() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        HashSet<Short> value = new HashSet<>(List.of((short) 1, (short) 2, (short) 3, (short) 4, (short) 5));
+        seatsType.put(SeatType.KISSES, value);
+        final CinemaHallDto cinema = new CinemaHallDto(2L, "Rose", (short) 5, seatsType);
+        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName(), RequiredFieldsForCreation.class));
+        final Map<String, String> map = ex.getMessageMap();
+        assertFalse(map.containsValue("field.error.not.null"));
+        assertFalse(map.containsValue("field.error.blank"));
+        assertFalse(map.containsValue("field.error.empty.collection"));
+        assertTrue(map.containsKey("id"));
+        assertEquals("field.error.null", map.get("id"));
+        assertFalse(map.containsKey("name"));
+        assertFalse(map.containsKey("seatsAmount"));
+        assertFalse(map.containsKey("seatsType"));
+    }
+
+    @Test
+    void validationCinemaHallUpdateIdNull() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        HashSet<Short> value = new HashSet<>(List.of((short) 1, (short) 2, (short) 3, (short) 4, (short) 5));
+        seatsType.put(SeatType.KISSES, value);
+        final CinemaHallDto cinema = new CinemaHallDto(null, "Rose", (short) 5, seatsType);
+        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName(), RequiredFieldsForUpdating.class));
+        final Map<String, String> map = ex.getMessageMap();
+        assertTrue(map.containsKey("id"));
+        assertEquals("field.error.not.null", map.get("id"));
+        assertFalse(map.containsKey("name"));
+        assertFalse(map.containsKey("seatsAmount"));
+        assertFalse(map.containsKey("seatsType"));
+    }
+
+    @Test
+    void validationCinemaHallUpdateIdLess1() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        HashSet<Short> value = new HashSet<>(List.of((short) 1, (short) 2, (short) 3, (short) 4, (short) 5));
+        seatsType.put(SeatType.KISSES, value);
+        final CinemaHallDto cinema = new CinemaHallDto(-3L, "Rose", (short) -3, seatsType);
+        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName(), RequiredFieldsForUpdating.class));
+        final Map<String, String> map = ex.getMessageMap();
+        assertTrue(map.containsKey("id"));
+        assertTrue(map.containsKey("seatsAmount"));
+        assertEquals("field.error.min._1", map.get("id"));
+        assertEquals("field.error.min._1", map.get("seatsAmount"));
     }
 
     @Test

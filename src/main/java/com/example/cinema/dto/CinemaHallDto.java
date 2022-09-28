@@ -1,6 +1,8 @@
 package com.example.cinema.dto;
 
 import com.example.cinema.core.DtoMarker;
+import com.example.cinema.core.RequiredFieldsForCreation;
+import com.example.cinema.core.RequiredFieldsForUpdating;
 import com.example.cinema.core.SeatType;
 import com.example.cinema.domain.CinemaHall;
 
@@ -16,7 +18,9 @@ import java.util.HashSet;
  * @author Alexandr Yefremov
  */
 public record CinemaHallDto(
-        @NotNull(message = "field.error.not.null") @Min(value = 1, message = "field.error.min._1") Long id,
+        @NotNull(message = "field.error.not.null", groups = RequiredFieldsForUpdating.class)
+        @Min(value = 1, message = "field.error.min._1", groups = RequiredFieldsForUpdating.class)
+        @Null(message = "field.error.null", groups = RequiredFieldsForCreation.class) Long id,
         @NotBlank(message = "field.error.blank") @Size(max = 20, min = 1, message = "field.error.size.incorrect") String name,
         @NotNull(message = "field.error.not.null") @Min(value = 1, message = "field.error.min._1") Short seatsAmount,
         @NotEmpty(message = "field.error.empty.collection") EnumMap<SeatType, HashSet<Short>> seatsType) implements Serializable, DtoMarker {
