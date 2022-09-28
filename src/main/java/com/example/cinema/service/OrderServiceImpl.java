@@ -1,11 +1,11 @@
 package com.example.cinema.service;
 
-import com.example.cinema.core.ValidatorHelper;
 import com.example.cinema.dao.OrderRepository;
 import com.example.cinema.domain.OrderTable;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.OrderDto;
 import com.example.cinema.service.converters.OrderConverter;
+import com.example.cinema.service.validator.ValidationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,21 +22,21 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
     private final OrderConverter converter;
     private final TimeTableService tableService;
+    private final ValidationService validator;
 
-    public OrderServiceImpl(OrderRepository repository, OrderConverter converter, TimeTableService tableService) {
+    public OrderServiceImpl(OrderRepository repository, OrderConverter converter, TimeTableService tableService, ValidationService validator) {
         this.repository = repository;
         this.converter = converter;
         this.tableService = tableService;
+        this.validator = validator;
     }
 
     @Override
     public OrderDto createOrder(OrderDto dto) {
-        if (dto == null || dto.getId().isPresent()) {
-            throw new IllegalStateException("OrderDto must be not null and its is must be null");
-        }
+        validator.validate(dto, OrderDto.class.getSimpleName());
         final TimeTable timeTable = tableService.getByIdEager(dto.getTimeTableId());
         if (timeTable.getStartSession().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("You can not saveOrder order for movie that has already started");
+            throw new IllegalArgumentException("start.session.already.been");
         }
         OrderTable orderTable = converter.toDomain(dto);
         orderTable.setOrderPrice(evaluateTotalPrice(timeTable, dto));
@@ -77,7 +77,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public boolean deleteOrder(Long id) {
-        ValidatorHelper.validateLong(id);
         final OrderTable order = repository.findOrderTableById(id).orElseThrow(() -> new EntityNotFoundException("Order by id not found"));
         if (order.getTimeTable().getStartSession().isBefore(LocalDateTime.now())) {
             return false;

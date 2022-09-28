@@ -1,5 +1,6 @@
 package com.example.cinema.service;
 
+import com.example.cinema.core.ValidationCustomException;
 import com.example.cinema.dto.OrderDto;
 import com.example.cinema.dto.TimeTableDto;
 import org.junit.jupiter.api.Test;
@@ -58,8 +59,9 @@ class OrderServiceTest {
                 .orderPrice(null)
                 .build();
 
-        final IllegalStateException orderSaved = assertThrowsExactly(IllegalStateException.class, () -> orderService.createOrder(order));
-        assertEquals("OrderDto must be not null and its is must be null", orderSaved.getMessage());
+        final ValidationCustomException orderSaved = assertThrowsExactly(ValidationCustomException.class, () -> orderService.createOrder(order));
+        assertTrue(orderSaved.getMessageMap().containsKey("id"));
+        assertTrue(orderSaved.getMessageMap().containsValue("field.error.null"));
 
     }
 
@@ -74,13 +76,7 @@ class OrderServiceTest {
                 .build();
 
         final IllegalArgumentException orderSaved = assertThrowsExactly(IllegalArgumentException.class, () -> orderService.createOrder(order));
-        assertEquals("You can not saveOrder order for movie that has already started", orderSaved.getMessage());
-
-    }
-
-    @Test
-    void createOrderNullDto() {
-        assertThrowsExactly(IllegalStateException.class, () -> orderService.createOrder(null));
+        assertEquals("start.session.already.been", orderSaved.getMessage());
 
     }
 

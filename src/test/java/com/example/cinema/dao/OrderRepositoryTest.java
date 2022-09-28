@@ -45,7 +45,7 @@ class OrderRepositoryTest extends BaseDataJpaTest {
     @Test
     @Transactional
     void deleteOrder() {
-        repository.deleteById(106L);
+        assertDoesNotThrow(() -> repository.deleteById(106L));
 
     }
 

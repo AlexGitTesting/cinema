@@ -1,7 +1,5 @@
 package com.example.cinema.dto;
 
-import com.example.cinema.core.RequiredFieldsForCreation;
-import com.example.cinema.core.RequiredFieldsForUpdating;
 import com.example.cinema.domain.OrderTable;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -24,14 +22,12 @@ import static java.util.Optional.ofNullable;
 public class OrderDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 42L;
-    @Null(groups = RequiredFieldsForCreation.class, message = "field.error.null")
-    @NotNull(groups = RequiredFieldsForUpdating.class, message = "field.error.not.null")
-    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "field.error.min._1")
+    @Null(message = "field.error.null")
     private final Long id;
-    @NotNull(groups = RequiredFieldsForUpdating.class, message = "field.error.not.null")
-    @Min(value = 1, groups = RequiredFieldsForUpdating.class, message = "field.error.min._1")
+    @NotNull(message = "field.error.not.null")
+    @Min(value = 1, message = "field.error.min._1")
     private final Long timeTableId;
-    @Null(groups = RequiredFieldsForCreation.class, message = "field.error.null")
+    @Null(message = "field.error.null")
     private final Integer orderPrice;
     @NotEmpty(message = "field.error.empty.collection")
     private final Set<Short> seats;

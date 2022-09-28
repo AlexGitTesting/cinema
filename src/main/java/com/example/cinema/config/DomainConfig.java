@@ -1,6 +1,7 @@
 package com.example.cinema.config;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +20,12 @@ import java.util.Locale;
 @Configuration(proxyBeanMethods = false)
 @EntityScan({"com.example.cinema.domain"})
 @EnableJpaRepositories(basePackages = {"com.example.cinema.dao"})
+@EnableConfigurationProperties(value = {ProjectProperties.class})
 public class DomainConfig implements WebMvcConfigurer {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
-        source.setBasenames("classpath:/i18n/i18n_local_message");
+        source.setBasenames("classpath:/i18n/local_message");
         source.setDefaultEncoding("UTF-8");
         return source;
     }

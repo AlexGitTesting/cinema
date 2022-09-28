@@ -109,6 +109,22 @@ class MovieControllerTest {
     }
 
     @Test
+    void updateNotValid() throws Exception {
+        final MovieDto dto = MovieDto.builder()
+                .producer("   ")
+                .title("Go to California")
+                .timing((short) 15)
+                .id(1005L)
+                .build();
+        final MockHttpServletRequestBuilder patch = MockMvcRequestBuilders.patch(b + "/update.json")
+                .content(objectMapper.writeValueAsString(dto))
+                .locale(new Locale("uk"))
+                .contentType(APPLICATION_JSON_VALUE)
+                .accept(APPLICATION_JSON_VALUE);
+        mockMvc.perform(patch).andDo(print()).andExpect(status().isOk());
+    }
+
+    @Test
     void getByFilter() throws Exception {
         final MovieQueryFilter of = MovieQueryFilter.builder().limit(10).page(0).title("of").build();
         final MockHttpServletRequestBuilder accept = MockMvcRequestBuilders.post(b + "/filter.json")

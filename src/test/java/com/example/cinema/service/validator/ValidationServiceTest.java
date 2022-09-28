@@ -7,13 +7,16 @@ import com.example.cinema.core.ValidationCustomException;
 import com.example.cinema.dto.BasisTimeTable;
 import com.example.cinema.dto.CinemaHallDto;
 import com.example.cinema.dto.MovieDto;
+import com.example.cinema.dto.OrderDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,7 +97,36 @@ class ValidationServiceTest {
     void validateMovieDtoUpdating() {
         final MovieDto dto = MovieDto.builder().id(50L).timing((short) 75).title("null").producer("null").build();
         assertDoesNotThrow(() -> service.validate(dto, MovieDto.class.getSimpleName(), RequiredFieldsForUpdating.class));
+    }
 
+    @Test
+    void validateOrder() {
+        final OrderDto dto = OrderDto.builder().orderPrice(1).seats(Collections.emptySet()).customer("  ").timeTableId(null).id(2L).build();
+        final ValidationCustomException exception = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(dto, OrderDto.class.getSimpleName()));
+        final Map<String, String> map = exception.getMessageMap();
+        assertTrue(map.containsKey("id"));
+        assertTrue(map.containsKey("timeTableId"));
+        assertTrue(map.containsKey("seats"));
+        assertTrue(map.containsKey("customer"));
+        assertTrue(map.containsValue("field.error.null"));
+        assertTrue(map.containsValue("field.error.not.null"));
+        assertFalse(map.containsValue("field.error.min._1"));
+        assertTrue(map.containsValue("field.error.empty.collection"));
+
+    }
+
+    @Test
+    void validateOrderMinTimTableId() {
+        final OrderDto dto = OrderDto.builder().orderPrice(null).seats(Set.of((short) 3)).customer("Petro").timeTableId(-12L).id(null).build();
+        final ValidationCustomException exception = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(dto, OrderDto.class.getSimpleName()));
+        final Map<String, String> map = exception.getMessageMap();
+        assertFalse(map.containsKey("id"));
+        assertTrue(map.containsKey("timeTableId"));
+        assertFalse(map.containsKey("seats"));
+        assertFalse(map.containsKey("customer"));
+        assertFalse(map.containsValue("field.error.null"));
+        assertTrue(map.containsValue("field.error.min._1"));
+        assertFalse(map.containsValue("field.error.empty.collection"));
 
     }
 }

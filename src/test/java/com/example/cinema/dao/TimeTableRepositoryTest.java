@@ -45,6 +45,12 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
 
     @Test
     @Transactional
+    void getByIdNotFount() {
+        assertThrowsExactly(NoSuchElementException.class, () -> repository.findById(10007L).orElseThrow());
+    }
+
+    @Test
+    @Transactional
     void deleteById() {
         repository.deleteById(1002L);
         entityManager.flush();
@@ -116,27 +122,28 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     @Test
     @Transactional
     void getTimeTableByIdEager() {
-        final TimeTable timeTable = assertDoesNotThrow(() -> repository.getTimeTableByIdEager(1015L).orElseThrow());
+        assertDoesNotThrow(() -> repository.getTimeTableByIdEager(1015L).orElseThrow());
     }
 
-    @Test
-    @Transactional
-    void ifTimeTableExistsByCinemaHallIdAndStartEarlier() {
-        final boolean b = repository.ifTimeTableExistsByCinemaHallIdLegacy(100L);
-        assertTrue(b);
-        final boolean c = repository.ifTimeTableExistsByCinemaHallIdLegacy(1L);
-        assertFalse(c);
-    }
+//    @Test
+//    @Transactional
+//    void ifTimeTableExistsByCinemaHallIdAndStartEarlier() {
+//        assertTrue(repository.ifTimeTableExistsByCinemaHallIdLegacy(100L));
+//        assertFalse(repository.ifTimeTableExistsByCinemaHallIdLegacy(1L));
+//    }
 
     @Test
     @Transactional
     void getByFilterOld() {
-        final long movieId = 1001L;
         final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
                 .dateSession(LocalDate.now()).build();
         final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
         final Set<TimeTable> collect = all.stream().filter(a -> a.getStartSession().isBefore(LocalDateTime.now())).collect(Collectors.toSet());
         collect.forEach(g -> log.info(g.toString()));
 
+    }
+
+    @Test
+    void ifTimeTableExistsByMovieIdInFuture() {// TODO: 15.09.2022  
     }
 }

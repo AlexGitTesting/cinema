@@ -34,3 +34,17 @@ spring:
     url: jdbc:postgresql://localhost:5439/cinema_db
     user: cinema_user
     password: cinema_password
+### Custom ###
+
+url:
+  base:
+    order: /order
+    movie: /movie
+    cinema_hall: /ciname_hall
+    time_table: /time_table
+  create: /create.json
+  get-by-id: /{id}/get.json
+  update: /update.json
+  get-by-filter: /filter.json
+  delete: /{id}/delete.json
+

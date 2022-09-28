@@ -37,14 +37,14 @@ public class CustomInitializer implements ApplicationRunner {
     @Transactional
     public void crete() {
         final CinemaHall red = new CinemaHall(null, "Go", (short) 10);
-        EnumMap<SeatType, HashSet<Integer>> seatsType = new EnumMap<>(SeatType.class);
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
 
-        HashSet<Integer> value = new HashSet<>(List.of(1, 2, 3));
-        HashSet<Integer> set2 = new HashSet<>(List.of(10, 11, 12, 13));
-        HashSet<Integer> set3 = new HashSet<>(List.of(14, 15, 16));
-        HashSet<Integer> put = seatsType.put(SeatType.BLIND, value);
-        final HashSet<Integer> put1 = seatsType.put(SeatType.LUXURY, set2);
-        final HashSet<Integer> put2 = seatsType.put(SeatType.KISSES, set3);
+        HashSet<Short> value = new HashSet<>(List.of((short) 1, (short) 2, (short) 3));
+        HashSet<Short> set2 = new HashSet<>(List.of((short) 10, (short) 11, (short) 12, (short) 13));
+        HashSet<Short> set3 = new HashSet<>(List.of((short) 14, (short) 15, (short) 16));
+        HashSet<Short> put = seatsType.put(SeatType.BLIND, value);
+        final HashSet<Short> put1 = seatsType.put(SeatType.LUXURY, set2);
+        final HashSet<Short> put2 = seatsType.put(SeatType.KISSES, set3);
         red.setSeatsType(seatsType);
         final CinemaHall savedHall = repository.save(red);
         final Movie movie = new Movie(null, "Title", (short) 50, "producer");

@@ -1,21 +1,28 @@
 package com.example.cinema.service;
 
 import com.example.cinema.dao.TimeTableQueryFilter;
+import com.example.cinema.dao.TimeTableRepository;
 import com.example.cinema.domain.TimeTable;
+import com.example.cinema.dto.BasisTimeTable;
 import com.example.cinema.dto.TimeTableDto;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockReset;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @Sql({
         "classpath:statements/insert_cinema_hall.sql",
@@ -28,10 +35,55 @@ import static org.junit.jupiter.api.Assertions.*;
         "classpath:statements/truncate_cinema_hall.sql"
 })
 @SpringBootTest
-class TimeTableServiceImplTest {
+class TimeTableServiceTest {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private TimeTableService service;
+    @SpyBean(reset = MockReset.BEFORE)
+    private TimeTableRepository spyRepoTime;
+
+    // create new
+    @Test
+    void createNewDtoValidator() {
+        clearInvocations(spyRepoTime);
+        final LocalDateTime date = LocalDateTime.of(2023, 2, 12, 12, 12);
+        final BasisTimeTable table = new BasisTimeTable(1000L, 100L
+                , date, (short) 35);
+        final TimeTableDto saved = service.createNew(table);
+        assertEquals(table.movieId(), saved.movie().getId().orElseThrow());
+        assertEquals(table.cinemaHallId(), saved.cinemaHall().id());
+        assertEquals(date, saved.startSession());
+        assertEquals((short) 35, saved.basePrice());
+        verify(spyRepoTime, only()).save(any());
+
+    }
+
+    @Test
+    void createValidateDtoIdsStartSession() {
+        clearInvocations(spyRepoTime);
+        final BasisTimeTable table = new BasisTimeTable(1000L, 100L
+                , LocalDateTime.of(2022, 2, 12, 12, 12), (short) 35);
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.createNew(table), "start.session.not.correct");
+        verify(spyRepoTime, never()).save(any());
+    }
+
+    @Test
+    void createNewValidateIdsMovieNotExists() {
+        clearInvocations(spyRepoTime);
+        final BasisTimeTable table = new BasisTimeTable(2000L, 100L
+                , LocalDateTime.of(2023, 2, 12, 12, 12), (short) 35);
+        assertThrowsExactly(EntityNotFoundException.class, () -> service.createNew(table), "not.found.movie");
+        verify(spyRepoTime, never()).save(any());
+    }
+
+    @Test
+    void createNewValidateCinemaNotExists() {
+        clearInvocations(spyRepoTime);
+        final BasisTimeTable table = new BasisTimeTable(2000L, 1000L
+                , LocalDateTime.of(2023, 2, 12, 12, 12), (short) 35);
+        assertThrowsExactly(EntityNotFoundException.class, () -> service.createNew(table), "not.found.cinema.hall");
+        verify(spyRepoTime, never()).save(any());
+    }
 
     @Test
     void getByFilerSingleMovie() {

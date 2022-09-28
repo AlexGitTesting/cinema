@@ -18,7 +18,7 @@ public interface OrderService {
      *
      * @param dto {@link OrderDto}
      * @return created OrderDto
-     * @throws IllegalArgumentException if dto is null or you try saveOrder order for movie that has already started
+     * @throws IllegalArgumentException you try save order for movie that has already started
      * @throws EntityNotFoundException  if {@link TimeTable} related to this Order not found
      * @see TimeTable#addClosedSeats(Set) will be used to add booked seats
      */

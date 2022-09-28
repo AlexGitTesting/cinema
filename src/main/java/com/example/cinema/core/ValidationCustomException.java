@@ -10,6 +10,7 @@ import java.util.Map;
  * @author Alexandr Yefremov
  */
 public class ValidationCustomException extends RuntimeException {
+
     private final static String standardMessage = "During  validation error occurred!";
     private final Map<String, String> messageMap = new HashMap<>();
 

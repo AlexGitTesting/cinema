@@ -12,6 +12,12 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 ext {
     set('testcontainersVersion', "1.17.3")
 }
@@ -32,6 +38,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
     implementation 'org.springdoc:springdoc-openapi-common:1.6.6'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 }
 
