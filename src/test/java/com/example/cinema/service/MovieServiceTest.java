@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,6 +55,12 @@ class MovieServiceTest {
     }
 
     @Test
+    void createNotValidDto() {
+        final MovieDto dto = MovieDto.builder().producer("  ").title("Go to California").timing((short) 15).build();
+        assertThrowsExactly(ValidationCustomException.class, () -> service.create(dto));
+    }
+
+    @Test
     void getByIdFound() {
         final MovieDto dto = assertDoesNotThrow(() -> service.getById(1004L));
         assertEquals("Dark of the Moon", dto.getTitle().orElseThrow());
@@ -88,7 +95,10 @@ class MovieServiceTest {
                 .title("Go to California")
                 .timing((short) 15)
                 .build();
-        assertThrowsExactly(ValidationCustomException.class, () -> service.update(dto));
+        final ValidationCustomException exception = assertThrowsExactly(ValidationCustomException.class, () -> service.update(dto));
+        final Map<String, String> messageMap = exception.getMessageMap();
+        assertTrue(messageMap.containsKey("id"));
+        assertEquals("field.error.not.null", messageMap.get("id"));
     }
 
     @Test

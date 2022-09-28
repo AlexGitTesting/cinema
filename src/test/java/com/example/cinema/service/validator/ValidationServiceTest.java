@@ -98,6 +98,16 @@ class ValidationServiceTest {
     }
 
     @Test
+    void validateMovieDtoUpdatingIdNull() {
+        final MovieDto dto = MovieDto.builder().id(null).timing((short) 75).title("null").producer("null").build();
+        final ValidationCustomException exception = assertThrowsExactly(ValidationCustomException.class
+                , () -> service.validate(dto, MovieDto.class.getSimpleName(), RequiredFieldsForUpdating.class));
+        final Map<String, String> messageMap = exception.getMessageMap();
+        assertTrue(messageMap.containsKey("id"));
+        assertEquals("field.error.not.null", messageMap.get("id"));
+    }
+
+    @Test
     void validateOrder() {
         final OrderDto dto = OrderDto.builder().orderPrice(1).seats(Collections.emptySet()).customer("  ").timeTableId(null).id(2L).build();
         final ValidationCustomException exception = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(dto, OrderDto.class.getSimpleName()));
