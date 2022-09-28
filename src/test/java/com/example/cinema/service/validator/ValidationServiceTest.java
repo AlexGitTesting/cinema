@@ -125,16 +125,12 @@ class ValidationServiceTest {
     void validationCinemaHallIncorrectFields() {
         EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
         final CinemaHallDto cinema = new CinemaHallDto(-1L, "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj", (short) 0, seatsType);
-        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName()));
+        final ValidationCustomException ex = assertThrowsExactly(ValidationCustomException.class, () -> service.validate(cinema, CinemaHallDto.class.getSimpleName(), RequiredFieldsForUpdating.class));
         final Map<String, String> map = ex.getMessageMap();
-        assertTrue(map.containsValue("field.error.min._1"));
-        assertTrue(map.containsValue("field.error.size.incorrect"));
-        assertTrue(map.containsValue("field.error.min._1"));
-        assertTrue(map.containsValue("field.error.empty.collection"));
-        assertTrue(map.containsKey("id"));
-        assertTrue(map.containsKey("name"));
-        assertTrue(map.containsKey("seatsAmount"));
-        assertTrue(map.containsKey("seatsType"));
+        assertEquals("field.error.min._1", map.get("id"));
+        assertEquals("field.error.size.incorrect", map.get("name"));
+        assertEquals("field.error.min._1", map.get("seatsAmount"));
+        assertEquals("field.error.empty.collection", map.get("seatsType"));
     }
 
     @Test
