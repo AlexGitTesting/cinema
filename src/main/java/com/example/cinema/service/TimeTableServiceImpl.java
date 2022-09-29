@@ -1,11 +1,13 @@
 package com.example.cinema.service;
 
-import com.example.cinema.dao.TimeTableQueryFilter;
-import com.example.cinema.dao.TimeTableRepository;
-import com.example.cinema.dao.TimeTableSpecification;
+import com.example.cinema.dao.*;
+import com.example.cinema.domain.CinemaHall;
+import com.example.cinema.domain.Movie;
 import com.example.cinema.domain.TimeTable;
+import com.example.cinema.dto.BasisTimeTable;
 import com.example.cinema.dto.TimeTableDto;
 import com.example.cinema.service.converters.TimeTableConverter;
+import com.example.cinema.service.validator.ValidationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
@@ -13,22 +15,50 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.example.cinema.core.ValidatorHelper.validateLong;
 
+/**
+ * Implementation of {@link TimeTableService}
+ *
+ * @author Alexandr Yefremov
+ */
 @Service
 public class TimeTableServiceImpl implements TimeTableService {
     private final TimeTableRepository repository;
     private final TimeTableSpecification specification;
     private final TimeTableConverter converter;
+    private final MovieRepository movieRepository;
+    private final CinemaHallRepository cinemaHallRepository;
+    private final ValidationService validator;
 
-    public TimeTableServiceImpl(TimeTableRepository repository, TimeTableSpecification specification, TimeTableConverter converter) {
+    public TimeTableServiceImpl(TimeTableRepository repository, TimeTableSpecification specification,
+                                TimeTableConverter converter, MovieRepository movieRepository,
+                                CinemaHallRepository cinemaHallRepository, ValidationService validator) {
         this.repository = repository;
         this.specification = specification;
         this.converter = converter;
+        this.movieRepository = movieRepository;
+        this.cinemaHallRepository = cinemaHallRepository;
+        this.validator = validator;
     }
 
+    @Override
+    @Transactional
+    public TimeTableDto createNew(BasisTimeTable dto) {
+        validator.validate(dto, BasisTimeTable.class.getSimpleName());
+        if (dto.startSession().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("start.session.not.correct");
+        }
+        final Movie movie = movieRepository.findById(dto.movieId()).orElseThrow(() -> new EntityNotFoundException("not.found.movie"));
+        final CinemaHall cinemaHall = cinemaHallRepository.findById(dto.cinemaHallId()).orElseThrow(() -> new EntityNotFoundException("not.found.cinema.hall"));
+        final TimeTable table = new TimeTable(null, movie, cinemaHall, dto.startSession(), dto.basePrice(), false);
+        return converter.toDto(repository.save(table));
+    }
+
+    // FIXME: 29.09.2022 find usages
     @Override
     @Transactional(readOnly = true)
     public TimeTableDto getByIdEagerAsDto(Long id) {
@@ -46,40 +76,27 @@ public class TimeTableServiceImpl implements TimeTableService {
 
     @Override
     @Transactional(readOnly = true)
-    public TimeTable getByIdWithCinemaHallOnlyEager(Long id) {
-        validateLong(id);
-        return repository.getTimeTableByIdAndCinemaHallOnlyEager(id).orElseThrow(() -> new EntityNotFoundException("TimeTable not found by id = " + id));
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Page<TimeTableDto> getByFiler(@NonNull TimeTableQueryFilter filter) {
         final Page<TimeTable> tables = repository.findAll(specification.getByFilter(filter), PageRequest.of(filter.getPage(), filter.getLimit()));
         return tables.map(converter::toDto);
     }
 
+    //todo for order service
     @Override
     @Transactional
     public TimeTable updateTimeTable(TimeTable table) {
         validateLong(table.getId());
         validateLong(table.getMovie().getId());
         validateLong(table.getCinemaHall().getId());
+        // FIXME: 29.09.2022 validate booked seats
         return repository.save(table);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean ifTimeTableExistsByCinemaHallIdLegacy(Long id) {
+    public boolean ifTimeTableExistsByCinemaHallIdInFuture(Long id) {
         validateLong(id);
-        return repository.ifTimeTableExistsByCinemaHallIdLegacy(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean ifTimeTableExistsByCinemaHallIdFuture(Long id) {
-        validateLong(id);
-        return repository.ifTimeTableExistsByCinemaHallIdFuture(id);
+        return repository.ifTimeTableExistsByCinemaHallIdInFuture(id);
     }
 
     @Override

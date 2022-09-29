@@ -57,7 +57,7 @@ public class CinemaHallServiceImpl implements CinemaHallService {
         if (tableService.ifTimeTableExistsByCinemaHallIdInFuture(dto.id())) {
             throw new IllegalArgumentException("You can not update cinema hall, because there will sessions in this cinema hall in the future");
         }
-        final CinemaHall cinemaHall = repository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("Cinema not fount"));
+        final CinemaHall cinemaHall = repository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("Cinema hall not found"));
         converter.toDomainTarget(dto, cinemaHall);
         return converter.toDto(repository.save(cinemaHall));
     }

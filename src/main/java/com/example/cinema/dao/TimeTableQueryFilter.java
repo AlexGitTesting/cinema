@@ -11,6 +11,11 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Query filter to find required timetable.
+ *
+ * @author Alexandr Yefremov
+ */
 @JsonDeserialize(builder = TimeTableQueryFilter.Builder.class)
 public final class TimeTableQueryFilter implements Serializable, FilterMarker {
     private final Integer page;

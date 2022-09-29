@@ -5,6 +5,7 @@ import com.example.cinema.dao.TimeTableRepository;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.BasisTimeTable;
 import com.example.cinema.dto.TimeTableDto;
+import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,12 +42,12 @@ class TimeTableServiceTest {
     @Autowired
     private TimeTableService service;
     @SpyBean(reset = MockReset.BEFORE)
-    private TimeTableRepository spyRepoTime;
+    private TimeTableRepository spyRepoTimeTable;
 
     // create new
     @Test
     void createNewDtoValidator() {
-        clearInvocations(spyRepoTime);
+        clearInvocations(spyRepoTimeTable);
         final LocalDateTime date = LocalDateTime.of(2023, 2, 12, 12, 12);
         final BasisTimeTable table = new BasisTimeTable(1000L, 100L
                 , date, (short) 35);
@@ -54,35 +56,35 @@ class TimeTableServiceTest {
         assertEquals(table.cinemaHallId(), saved.cinemaHall().id());
         assertEquals(date, saved.startSession());
         assertEquals((short) 35, saved.basePrice());
-        verify(spyRepoTime, only()).save(any());
+        verify(spyRepoTimeTable, only()).save(any());
 
     }
 
     @Test
-    void createValidateDtoIdsStartSession() {
-        clearInvocations(spyRepoTime);
+    void createTimeTableSessionNotCorrect() {
+        clearInvocations(spyRepoTimeTable);
         final BasisTimeTable table = new BasisTimeTable(1000L, 100L
                 , LocalDateTime.of(2022, 2, 12, 12, 12), (short) 35);
         assertThrowsExactly(IllegalArgumentException.class, () -> service.createNew(table), "start.session.not.correct");
-        verify(spyRepoTime, never()).save(any());
+        verify(spyRepoTimeTable, never()).save(any());
     }
 
     @Test
     void createNewValidateIdsMovieNotExists() {
-        clearInvocations(spyRepoTime);
+        clearInvocations(spyRepoTimeTable);
         final BasisTimeTable table = new BasisTimeTable(2000L, 100L
                 , LocalDateTime.of(2023, 2, 12, 12, 12), (short) 35);
         assertThrowsExactly(EntityNotFoundException.class, () -> service.createNew(table), "not.found.movie");
-        verify(spyRepoTime, never()).save(any());
+        verify(spyRepoTimeTable, never()).save(any());
     }
 
     @Test
     void createNewValidateCinemaNotExists() {
-        clearInvocations(spyRepoTime);
+        clearInvocations(spyRepoTimeTable);
         final BasisTimeTable table = new BasisTimeTable(2000L, 1000L
                 , LocalDateTime.of(2023, 2, 12, 12, 12), (short) 35);
         assertThrowsExactly(EntityNotFoundException.class, () -> service.createNew(table), "not.found.cinema.hall");
-        verify(spyRepoTime, never()).save(any());
+        verify(spyRepoTimeTable, never()).save(any());
     }
 
     @Test
@@ -129,5 +131,30 @@ class TimeTableServiceTest {
         final TimeTable saved = assertDoesNotThrow(() -> service.updateTimeTable(timeTable));
         assertTrue(saved.getClosedSeats().containsAll(args));
         assertTrue(saved.getIsSold());
+    }
+
+    @Test
+    void ifTimeTableExistsByCinemaHallIdInFutureIdNotCorrect() {
+        clearInvocations(spyRepoTimeTable);
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.ifTimeTableExistsByCinemaHallIdInFuture(-3L), "Argument is invalid");
+        verify(spyRepoTimeTable, never()).ifTimeTableExistsByCinemaHallIdInFuture(anyLong());
+    }
+
+    @Test
+    void ifTimeTableExistsByCinemaHallIdInFutureIdCorrect() {
+        clearInvocations(spyRepoTimeTable);
+        final boolean b = service.ifTimeTableExistsByCinemaHallIdInFuture(100L);
+        assertTrue(b);
+        verify(spyRepoTimeTable, only()).ifTimeTableExistsByCinemaHallIdInFuture(100L);
+
+    }
+
+    @Test
+    void getByIdOptionalLazy() {
+        final Optional<TimeTable> time = service.getByIdOptionalLazy(1004L);
+        assertTrue(time.isPresent());
+        assertThrowsExactly(LazyInitializationException.class, () -> {
+            short amount = time.get().getCinemaHall().getSeatsAmount();
+        });
     }
 }
