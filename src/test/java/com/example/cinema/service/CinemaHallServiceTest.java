@@ -110,6 +110,6 @@ class CinemaHallServiceTest {
 
     @Test
     void deleteNOTAllow() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> service.delete(101L), "You can not delete cinema hall, because there are timetables references on this cinema hall");
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.delete(101L), CinemaHallServiceImpl.CAN_NOT_DELETE);
     }
 }

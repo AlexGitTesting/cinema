@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 
-import static com.example.cinema.core.ValidatorHelper.validateLong;
-
 /**
  * Implementation of the CinemaHallService.
  *
@@ -22,6 +20,8 @@ import static com.example.cinema.core.ValidatorHelper.validateLong;
 @Service
 public class CinemaHallServiceImpl implements CinemaHallService {
 
+    public static final String CAN_NOT_UPDATE = "You can not update cinema hall, because there will sessions in this cinema hall in the future";
+    public static final String CAN_NOT_DELETE = "You can not delete cinema hall, because there are timetables references on this cinema hall";
     private final CinemaHallConverter converter;
     private final CinemaHallRepository repository;
     private final TimeTableService tableService;
@@ -53,9 +53,8 @@ public class CinemaHallServiceImpl implements CinemaHallService {
     @Transactional
     public CinemaHallDto update(CinemaHallDto dto) {
         validator.validate(dto, CinemaHallDto.class.getSimpleName(), RequiredFieldsForUpdating.class);
-
         if (tableService.ifTimeTableExistsByCinemaHallIdInFuture(dto.id())) {
-            throw new IllegalArgumentException("You can not update cinema hall, because there will sessions in this cinema hall in the future");
+            throw new IllegalArgumentException(CAN_NOT_UPDATE);
         }
         final CinemaHall cinemaHall = repository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("not.found.cinema.hall"));
         converter.toDomainTarget(dto, cinemaHall);
@@ -65,12 +64,10 @@ public class CinemaHallServiceImpl implements CinemaHallService {
     @Override
     @Transactional
     public Long delete(Long id) {
-        validateLong(id);
         if (!tableService.ifTimeTableExistsByCinemaHallIdInFuture(id)) {
             repository.deleteById(id);
             return id;
         }
-        throw new IllegalArgumentException("You can not delete cinema hall, because there are timetables references on this cinema hall");
-
+        throw new IllegalArgumentException(CAN_NOT_DELETE);
     }
 }
