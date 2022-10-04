@@ -34,6 +34,7 @@ public class TimeTableServiceImpl implements TimeTableService {
     private final CinemaHallRepository cinemaHallRepository;
     private final ValidationService validator;
 
+
     public TimeTableServiceImpl(TimeTableRepository repository, TimeTableSpecification specification,
                                 TimeTableConverter converter, MovieRepository movieRepository,
                                 CinemaHallRepository cinemaHallRepository, ValidationService validator) {
@@ -53,7 +54,7 @@ public class TimeTableServiceImpl implements TimeTableService {
             throw new IllegalArgumentException("start.session.not.correct");
         }
         final Movie movie = movieRepository.findById(dto.movieId()).orElseThrow(() -> new EntityNotFoundException("not.found.movie"));
-        final CinemaHall cinemaHall = cinemaHallRepository.findById(dto.cinemaHallId()).orElseThrow(() -> new EntityNotFoundException("not.found.cinema.hall"));
+        final CinemaHall cinemaHall = cinemaHallRepository.getCinemaHall(dto.cinemaHallId()).orElseThrow(() -> new EntityNotFoundException("not.found.cinema.hall"));
         final TimeTable table = new TimeTable(null, movie, cinemaHall, dto.startSession(), dto.basePrice(), false);
         return converter.toDto(repository.save(table));
     }
@@ -62,7 +63,6 @@ public class TimeTableServiceImpl implements TimeTableService {
     @Override
     @Transactional(readOnly = true)
     public TimeTableDto getByIdEagerAsDto(Long id) {
-        validateLong(id);
         final TimeTable timeTable = repository.getTimeTableByIdEager(id).orElseThrow(() -> new EntityNotFoundException("TimeTable not found by id = " + id));
         return converter.toDto(timeTable);
     }
@@ -99,6 +99,7 @@ public class TimeTableServiceImpl implements TimeTableService {
         return repository.ifTimeTableExistsByCinemaHallIdInFuture(id);
     }
 
+    // TODO: 04.10.2022 fix, see usages
     @Override
     @Transactional(readOnly = true)
     public Optional<TimeTable> getByIdOptionalLazy(Long id) {

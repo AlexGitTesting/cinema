@@ -9,24 +9,27 @@ import org.springframework.web.server.ResponseStatusException;
  * @author Alexandr Yefremov
  */
 public interface ValidatorHelper {
+
+    String INVALID_NUMBER = "Argument is invalid. Number must be not null and greater then 0";
+
     /**
-     * Validate short.
+     * Validates short.
      *
      * @param s not null and greater then 0
      * @throws IllegalArgumentException if param is not correct
      */
     static void validateShort(Short s) throws IllegalArgumentException {
-        if (s == null || s < 1) throw new IllegalArgumentException("Argument is invalid");
+        if (s == null || s < 1) throw new IllegalArgumentException(INVALID_NUMBER);
     }
 
     /**
-     * Validate long.
+     * Validates long.
      *
      * @param s not null and greater then 0
      * @throws IllegalArgumentException if param is not correct
      */
     static void validateLong(Long s) throws IllegalArgumentException {
-        if (s == null || s < 1) throw new IllegalArgumentException("Argument is invalid");
+        if (s == null || s < 1) throw new IllegalArgumentException(INVALID_NUMBER);
     }
 // FIXME: 28.09.2022 remove
 //    static void validateString(String s)throws IllegalArgumentException {
@@ -41,6 +44,6 @@ public interface ValidatorHelper {
      */
     static void validateParam(Long id) throws ResponseStatusException {
         if (id == null || id < 1)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id, must be not null and greater then 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, INVALID_NUMBER);
     }
 }

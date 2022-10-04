@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Contract fo removing entity by id.
+ * Contract provides functionality of  removing entity by id.
  *
  * @author Alexandr Yefremov
  */

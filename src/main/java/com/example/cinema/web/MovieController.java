@@ -1,6 +1,6 @@
 package com.example.cinema.web;
 
-import com.example.cinema.core.CrudContract;
+import com.example.cinema.core.CreateUpdateContract;
 import com.example.cinema.core.DeleteContract;
 import com.example.cinema.core.FilterableContract;
 import com.example.cinema.dao.MovieQueryFilter;
@@ -25,7 +25,7 @@ import static com.example.cinema.core.ValidatorHelper.validateParam;
 @RestController
 @RequestMapping(path = "${url.base.movie}")
 @Tag(name = "Movie controller", description = "Handles HTTP requests connected with Movie")
-public class MovieController implements CrudContract<MovieDto>, DeleteContract, FilterableContract<MovieDto, MovieQueryFilter> {
+public class MovieController implements CreateUpdateContract<MovieDto>, DeleteContract, FilterableContract<MovieDto, MovieQueryFilter> {
     private final MovieService service;
 
     public MovieController(MovieService service) {

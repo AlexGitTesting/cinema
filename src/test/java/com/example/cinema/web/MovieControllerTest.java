@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 class MovieControllerTest {
-    private static String b = "/movie";
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -48,7 +48,7 @@ class MovieControllerTest {
                 .title("Go to California")
                 .timing((short) 15)
                 .build();
-        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getMovie() + "" + prop.getCreate())
+        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getMovie() + prop.getCreate())
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto));
@@ -74,7 +74,7 @@ class MovieControllerTest {
 
     @Test
     void getById() throws Exception {
-        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getMovie() + "" + prop.getGetById(), 1004)
+        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getMovie() + prop.getGetById(), 1004)
                 .locale(new Locale("uk"))
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE);

@@ -45,7 +45,7 @@ public class CinemaHallServiceImpl implements CinemaHallService {
     @Override
     @Transactional(readOnly = true)
     public CinemaHallDto readById(Long id) {
-        final CinemaHall hall = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cinema hall not found"));
+        final CinemaHall hall = repository.getCinemaHall(id).orElseThrow(() -> new EntityNotFoundException("not.found.cinema.hall"));
         return converter.toDto(hall);
     }
 
@@ -57,7 +57,7 @@ public class CinemaHallServiceImpl implements CinemaHallService {
         if (tableService.ifTimeTableExistsByCinemaHallIdInFuture(dto.id())) {
             throw new IllegalArgumentException("You can not update cinema hall, because there will sessions in this cinema hall in the future");
         }
-        final CinemaHall cinemaHall = repository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("Cinema hall not found"));
+        final CinemaHall cinemaHall = repository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("not.found.cinema.hall"));
         converter.toDomainTarget(dto, cinemaHall);
         return converter.toDto(repository.save(cinemaHall));
     }

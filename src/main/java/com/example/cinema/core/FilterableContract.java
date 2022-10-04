@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
- * Contract for controllers that implements queries by filter
+ * Contract for controllers that implement queries by filter.
  *
  * @param <D> {@link DtoMarker}
  * @param <F> {@link FilterMarker}

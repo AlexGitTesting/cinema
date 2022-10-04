@@ -34,10 +34,9 @@ public interface TimeTableService {
      *
      * @param id timetable's id
      * @return {@link TimeTableDto}
-     * @throws IllegalArgumentException if id not valid {@link ValidatorHelper#validateLong(Long)}
-     * @throws EntityNotFoundException  if timetable not found by id
+     * @throws EntityNotFoundException if timetable not found by id
      */
-    TimeTableDto getByIdEagerAsDto(Long id) throws IllegalArgumentException, EntityNotFoundException;
+    TimeTableDto getByIdEagerAsDto(Long id) throws EntityNotFoundException;
 
     /**
      * Gets timetable by id as eager fetching.
