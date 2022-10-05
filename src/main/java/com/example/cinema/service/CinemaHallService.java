@@ -1,5 +1,6 @@
 package com.example.cinema.service;
 
+import com.example.cinema.core.CustomConstraintException;
 import com.example.cinema.dto.CinemaHallDto;
 
 import javax.persistence.EntityNotFoundException;
@@ -10,13 +11,15 @@ import javax.persistence.EntityNotFoundException;
  * @author Alexandr Yefremov
  */
 public interface CinemaHallService {
+
     /**
      * Creates new cinema hall.
      *
      * @param dto {@link CinemaHallDto}
      * @return saved {@link CinemaHallDto}
+     * @throws CustomConstraintException if {@link CinemaHallDto#name()} contains not unique name
      */
-    CinemaHallDto createCinemaHall(CinemaHallDto dto);
+    CinemaHallDto createCinemaHall(CinemaHallDto dto) throws CustomConstraintException;
 
     /**
      * Retrieves cinema hall by id.
@@ -32,10 +35,11 @@ public interface CinemaHallService {
      *
      * @param dto {@link CinemaHallDto}
      * @return updated cinema hall
-     * @throws IllegalArgumentException if there will sessions in this cinema hall in the future
-     * @throws EntityNotFoundException  if cinema hall is not existed by {@link CinemaHallDto#id()}
+     * @throws IllegalArgumentException  if there will sessions in this cinema hall in the future
+     * @throws EntityNotFoundException   if cinema hall is not existed by {@link CinemaHallDto#id()}
+     * @throws CustomConstraintException if {@link CinemaHallDto#name()} contains not unique name
      */
-    CinemaHallDto update(CinemaHallDto dto) throws IllegalArgumentException, EntityNotFoundException;
+    CinemaHallDto update(CinemaHallDto dto) throws IllegalArgumentException, EntityNotFoundException, CustomConstraintException;
 
     /**
      * Removes cinema hall by id.

@@ -1,5 +1,6 @@
 package com.example.cinema.service;
 
+import com.example.cinema.core.CustomConstraintException;
 import com.example.cinema.core.SeatType;
 import com.example.cinema.dto.CinemaHallDto;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class CinemaHallServiceTest {
 
 
     @Test
-    void createCinemaHall() {
+    void createCinemaHallOk() {
         EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
         seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
         seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
@@ -43,6 +44,19 @@ class CinemaHallServiceTest {
         assertNotNull(saved.id());
         assertEquals(amount, dto.seatsAmount());
         assertEquals(seatsType, dto.seatsType());
+    }
+
+    @Test
+    void createCinemaHallNameNotUnique() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        String name = "BLACK";
+        short amount = 10;
+        final CinemaHallDto dto = new CinemaHallDto(null, name, amount, seatsType);
+        assertThrowsExactly(CustomConstraintException.class, () -> service.createCinemaHall(dto), "cinema.hall.name.not.unique");
+
     }
 
     @Test
@@ -87,7 +101,7 @@ class CinemaHallServiceTest {
     }
 
     @Test
-    void update() {
+    void updateOk() {
         EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
         seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
         seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
@@ -99,8 +113,45 @@ class CinemaHallServiceTest {
         assertEquals(amount, saved.seatsAmount());
         assertEquals(seatsType, saved.seatsType());
         assertEquals(104, saved.id());
+    }
+
+    @Test
+    void updateNotUniqueName() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        String name = "BLACK";
+        short amount = 10;
+        final CinemaHallDto dto = new CinemaHallDto(104L, name, amount, seatsType);
+        assertThrowsExactly(CustomConstraintException.class, () -> service.update(dto), "cinema.hall.name.not.unique");
 
     }
+
+    @Test
+    void updateThereWillSessionInTheFutureInThisHall() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        String name = "name";
+        short amount = 10;
+        final CinemaHallDto dto = new CinemaHallDto(101L, name, amount, seatsType);
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.update(dto), CinemaHallServiceImpl.CAN_NOT_UPDATE);
+    }
+
+    @Test
+    void updateHallNotFound() {
+        EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
+        seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
+        seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7)));
+        seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 8, (short) 9, (short) 10)));
+        String name = "name";
+        short amount = 10;
+        final CinemaHallDto dto = new CinemaHallDto(110L, name, amount, seatsType);
+        assertThrowsExactly(EntityNotFoundException.class, () -> service.update(dto), "not.found.cinema.hall");
+    }
+
 
     @Test
     void deleteAllow() {

@@ -18,9 +18,11 @@ import static com.example.cinema.core.ValidatorHelper.validateParam;
 @Tag(name = "Cinema hall controller.", description = "Handles HTTP requests connected with Cinema hall")
 public class CinemaHallController implements CreateUpdateContract<CinemaHallDto>, DeleteContract, GetByIdContract<CinemaHallDto> {
     private final CinemaHallService service;
+    private final ResponseExceptionHandler exceptionHandler;
 
-    public CinemaHallController(CinemaHallService service) {
+    public CinemaHallController(CinemaHallService service, ResponseExceptionHandler exceptionHandler) {
         this.service = service;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @Operation(summary = "Creates new cinema hall.")
@@ -29,6 +31,7 @@ public class CinemaHallController implements CreateUpdateContract<CinemaHallDto>
         return service.createCinemaHall(dto);
     }
 
+    @Operation(summary = "Updates existed cinema hall.")
     @Override
     public CinemaHallDto update(CinemaHallDto dto) {
         return service.update(dto);
@@ -37,7 +40,12 @@ public class CinemaHallController implements CreateUpdateContract<CinemaHallDto>
     @Override
     public ResponseEntity<Object> delete(Long id) {
         validateParam(id);
-        return ResponseEntity.ok().body("Cinema hall successfully removed. Id is -" + id);
+        final Long delete = service.delete(id);
+        assert id.equals(delete);
+        final String message = exceptionHandler.prepareLocalizedMessage("cinema.hall.removed"
+                , String.format("Cinema hall with id %d successfully removed.", id)
+                , new Object[]{id});
+        return ResponseEntity.ok().body(message);
     }
 
     @Operation(summary = "Retrieves cinema hall.", description = "Retrieves cinema hall by id")
