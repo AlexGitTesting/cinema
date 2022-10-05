@@ -1,5 +1,6 @@
 package com.example.cinema.core;
 
+import com.example.cinema.domain.TimeTable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -11,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 public interface ValidatorHelper {
 
     String INVALID_NUMBER = "Argument is invalid. Number must be not null and greater then 0";
+    String INVALID_PRICE = "Price must be not null and greater or equals 0.";
 
     /**
      * Validates short.
@@ -31,10 +33,16 @@ public interface ValidatorHelper {
     static void validateLong(Long s) throws IllegalArgumentException {
         if (s == null || s < 1) throw new IllegalArgumentException(INVALID_NUMBER);
     }
-// FIXME: 28.09.2022 remove
-//    static void validateString(String s)throws IllegalArgumentException {
-//        if (!StringUtils.hasLength(s)) throw new IllegalArgumentException("Argument is invalid");
-//    }
+
+    /**
+     * Validate {@link TimeTable#getBasePrice()}
+     *
+     * @param price price
+     * @throws IllegalArgumentException if price null or less then 0
+     */
+    static void validateBasePrice(Short price) throws IllegalArgumentException {
+        if (price == null || price < 0) throw new IllegalArgumentException(INVALID_PRICE);
+    }
 
     /**
      * Validates id.

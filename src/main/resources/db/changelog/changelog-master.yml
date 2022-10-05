@@ -39,5 +39,11 @@ databaseChangeLog:
   - include:
       file: DDL/005_order_cascade_rem.sql
       relativeToChangelogFile: true
+  - changeSet:
+      id: 6
+      author: Alexandr_Yefriemov
+  - include:
+      file: DDL/006_time_table_add_check_base_price.sql
+      relativeToChangelogFile: true
 
 

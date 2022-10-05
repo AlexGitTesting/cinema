@@ -41,6 +41,7 @@ public class CinemaHall extends AuditableEntity {
 
     public CinemaHall(Long id, String name, Short seatsAmount) {
         super(id);
+        validateSeatsAmount(seatsAmount);
         this.name = name;
         this.seatsAmount = seatsAmount;
     }
@@ -58,7 +59,18 @@ public class CinemaHall extends AuditableEntity {
     }
 
     public void setSeatsAmount(Short seatsAmount) {
+        validateSeatsAmount(seatsAmount);
         this.seatsAmount = seatsAmount;
+    }
+
+    /**
+     * Validate seats amount.
+     *
+     * @param seatsAmount amount of a seats
+     * @throws IllegalArgumentException if amount is not correct
+     */
+    private void validateSeatsAmount(Short seatsAmount) throws IllegalArgumentException {
+        if (seatsAmount == null || seatsAmount < 1) throw new IllegalArgumentException("seats.amount.less.one");
     }
 
     /**

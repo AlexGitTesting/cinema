@@ -117,4 +117,16 @@ class CinemaHallTest {
         red.setSeatsType(getSeatsTypes());
         assertThrowsExactly(IllegalArgumentException.class, () -> red.getSeatTypeBySeatNumber((short) -2), "Invalid seat number");
     }
+
+    @Test
+    void setSeatsAmountNotValidAmount() {
+        assertThrowsExactly(IllegalArgumentException.class, () -> new CinemaHall(null, "name", (short) -3), "seats.amount.less.one");
+    }
+
+    @Test
+    void setSeatsAmountNotValidAmountSetter() {
+        final CinemaHall cinemaHall = new CinemaHall(null, "name", (short) 20);
+        cinemaHall.setSeatsType(getSeatsTypes());
+        assertThrowsExactly(IllegalArgumentException.class, () -> cinemaHall.setSeatsAmount((short) -3), "seats.amount.less.one");
+    }
 }

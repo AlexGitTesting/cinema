@@ -1,7 +1,10 @@
 package com.example.cinema.service;
 
+import com.example.cinema.core.ValidatorHelper;
 import com.example.cinema.dao.TimeTableQueryFilter;
 import com.example.cinema.dao.TimeTableRepository;
+import com.example.cinema.domain.CinemaHall;
+import com.example.cinema.domain.Movie;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.BasisTimeTable;
 import com.example.cinema.dto.TimeTableDto;
@@ -131,6 +134,33 @@ class TimeTableServiceTest {
         final TimeTable saved = assertDoesNotThrow(() -> service.updateTimeTable(timeTable));
         assertTrue(saved.getClosedSeats().containsAll(args));
         assertTrue(saved.getIsSold());
+    }
+
+    @Test
+    void updateTimeTableValidateId() {
+        final TimeTable timeTable = assertDoesNotThrow(() -> service.getByIdEager(1015L));
+        final Set<Short> args = Set.of((short) 1, (short) 2, (short) 4, (short) 5);
+        assertTrue(timeTable.addClosedSeats(args));
+        timeTable.setId(-3L);
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.updateTimeTable(timeTable), ValidatorHelper.INVALID_NUMBER);
+    }
+
+    @Test
+    void updateTimeTableValidateMovieId() {
+        final TimeTable timeTable = assertDoesNotThrow(() -> service.getByIdEager(1015L));
+        final Set<Short> args = Set.of((short) 1, (short) 2, (short) 4, (short) 5);
+        assertTrue(timeTable.addClosedSeats(args));
+        timeTable.setMovie(new Movie(-3L));
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.updateTimeTable(timeTable), ValidatorHelper.INVALID_NUMBER);
+    }
+
+    @Test
+    void updateTimeTableValidateCinemaHallId() {
+        final TimeTable timeTable = assertDoesNotThrow(() -> service.getByIdEager(1015L));
+        final Set<Short> args = Set.of((short) 1, (short) 2, (short) 4, (short) 5);
+        assertTrue(timeTable.addClosedSeats(args));
+        timeTable.setCinemaHall(new CinemaHall(-3L));
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.updateTimeTable(timeTable), ValidatorHelper.INVALID_NUMBER);
     }
 
     @Test
