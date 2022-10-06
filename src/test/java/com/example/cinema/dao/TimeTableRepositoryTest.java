@@ -170,15 +170,9 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    void getTimeTableByIdEagerCinemaHallOnly() {
+    void getTimeTableByIdEagerModified() {
         final Optional<TimeTable> table = repository.getTimeTableByIdEagerModified(1010L);
         assertTrue(table.isPresent());
         assertDoesNotThrow(() -> table.get().getCinemaHall().getSeatsAmount());
-//        assertDoesNotThrow(()->table.get().getMovie().getProducer());
-//        final PersistenceUnitUtil util = entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
-//        final boolean cinemaHall = util.isLoaded(table.get(), "cinemaHall");
-//        final boolean loaded = util.isLoaded(table.get().getCinemaHall());
-//        final boolean movie = util.isLoaded(table.get(), "movie");
-//        final boolean loaded1 = util.isLoaded(table.get().getMovie());
     }
 }
