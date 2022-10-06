@@ -28,6 +28,12 @@ databaseChangeLog:
       id: 4
       author: Alexandr_Yefriemov
   - include:
+      file: DML/001_1_truncate_tables.sql
+      relativeToChangelogFile: true
+  - changeSet:
+      id: 5
+      author: Alexandr_Yefriemov
+  - include:
       file: DML/001_fill_movie.sql
       relativeToChangelogFile: true
   - include:
@@ -43,7 +49,11 @@ databaseChangeLog:
       id: 6
       author: Alexandr_Yefriemov
   - include:
-      file: DDL/006_time_table_add_check_base_price.sql
+      file: DML/003_fill_in_time_table.sql
       relativeToChangelogFile: true
+  - include:
+      file: DML/004_fill_in_order_table.sql
+      relativeToChangelogFile: true
+
 
 

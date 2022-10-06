@@ -12,7 +12,8 @@ create table if not exists time_table
         constraint time_table_movie_fk references movie,
     cinema_hall_id bigint                  not null
         constraint time_table_cinema_hall_fk references cinema_hall,
-    start_session  timestamp               not null,
+    start_session  timestamp               not null
+        constraint time_table_base_price_check check ( base_price >= 0 ),
     base_price     smallint                not null,
     closed_seats   jsonb     default '{}'  not null,
     sold           boolean   default false

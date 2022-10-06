@@ -28,7 +28,7 @@ public class OrderController {
         return orderService.createOrder(dto);
     }
 
-    @Operation(summary = "Gets order.", description = "Gets order by id")
+    @Operation(summary = "Gets order by id.", description = "Gets order by id")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(path = "/{id}/get-order.json")
     OrderDto getById(@Parameter(description = "Order id. Not null and greater then 0") @PathVariable("id") Long id) {
