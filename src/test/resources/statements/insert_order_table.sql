@@ -271,6 +271,18 @@ values (100, create_order_booking_time(1000), 1000, count_total_price(1000), '[
          6,
          9,
          10
+       ]', 'customer'),
+
+
+       --for test see timetable maybe need to insert for production
+       (148, create_order_booking_time(1030), 1030, count_total_price(1030), '[
+         2,
+         3,
+         6
+       ]', 'customer'),
+       (149, create_order_booking_time(1030), 1030, count_total_price(1030), '[
+         7,
+         10
        ]', 'customer');
 
 

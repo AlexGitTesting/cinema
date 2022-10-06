@@ -84,18 +84,18 @@ public class OrderTable extends AuditableEntity {
         if (this == o) return true;
         if (!(o instanceof OrderTable orderTable)) return false;
         if (!super.equals(o)) return false;
-        return getTimeTable().equals(orderTable.getTimeTable()) && getOrderPrice().equals(orderTable.getOrderPrice()) && getSeats().equals(orderTable.getSeats()) && Objects.equals(customer, orderTable.customer);
+        return getTimeTable().getId().equals(orderTable.getTimeTable().getId()) && getOrderPrice().equals(orderTable.getOrderPrice()) && getSeats().equals(orderTable.getSeats()) && Objects.equals(customer, orderTable.customer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getTimeTable(), getOrderPrice(), getSeats(), customer);
+        return Objects.hash(super.hashCode(), getTimeTable().getId(), getOrderPrice(), getSeats(), customer);
     }
 
     @Override
     public String toString() {
         return "OrderTable{" +
-                "timeTable=" + timeTable +
+                "timeTable id =" + timeTable.getId() +
                 ", orderPrice=" + orderPrice +
                 ", seats=" + seats +
                 ", customer='" + customer + '\'' +

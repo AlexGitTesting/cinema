@@ -1,16 +1,20 @@
 package com.example.cinema.service;
 
 import com.example.cinema.dao.OrderRepository;
+import com.example.cinema.dao.TimeTableRepository;
 import com.example.cinema.domain.OrderTable;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.OrderDto;
 import com.example.cinema.service.converters.OrderConverter;
 import com.example.cinema.service.validator.ValidationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+
+import static java.lang.String.format;
 
 /**
  * Implementation of {@link OrderService}.
@@ -19,39 +23,43 @@ import java.time.LocalDateTime;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
+    public static final String TABLE_NOT_FOUND = "Timetable with id \"%d\" not found";
+    public static final String TOTAL_PRICE_BECAME_HUGE = "Total price of the order became more then maximum allowable value";
+    public static final String ORDER_NOT_FOUND = "Order by id %d not found";
     private final OrderRepository repository;
     private final OrderConverter converter;
-    private final TimeTableService tableService;
     private final ValidationService validator;
+    private final TimeTableRepository timeTableRepository;
 
-    public OrderServiceImpl(OrderRepository repository, OrderConverter converter, TimeTableService tableService, ValidationService validator) {
+    public OrderServiceImpl(OrderRepository repository, OrderConverter converter, ValidationService validator, TimeTableRepository timeTableRepository) {
         this.repository = repository;
         this.converter = converter;
-        this.tableService = tableService;
         this.validator = validator;
+        this.timeTableRepository = timeTableRepository;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public OrderDto createOrder(OrderDto dto) {
         validator.validate(dto, OrderDto.class.getSimpleName());
-        final TimeTable timeTable = tableService.getByIdEager(dto.getTimeTableId());
+        final TimeTable timeTable = timeTableRepository.getTimeTableByIdEagerCinemaHallOnly(dto.getTimeTableId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException(format(TABLE_NOT_FOUND, dto.getTimeTableId()))
+                );
+        if (timeTable.getIsSold()) {
+            throw new IllegalStateException("seats.all.sold");
+        }
         if (timeTable.getStartSession().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("start.session.already.been");
         }
         OrderTable orderTable = converter.toDomain(dto);
-        orderTable.setOrderPrice(evaluateTotalPrice(timeTable, dto));
         timeTable.addClosedSeats(dto.getSeats());
+        orderTable.setOrderPrice(evaluateTotalPrice(timeTable, dto));
         orderTable.setTimeTable(timeTable);
-        saveOrder(orderTable);
-        tableService.updateTimeTable(timeTable);
+        timeTableRepository.save(timeTable);
+        orderTable = repository.save(orderTable);
         return converter.toDto(orderTable);
 
-    }
-
-    @Transactional
-    @Override
-    public OrderTable saveOrder(OrderTable order) {
-        return repository.save(order);
     }
 
     /**
@@ -69,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
             totalPrice += Math.round(timeTable.getBasePrice() * timeTable.getCinemaHall().getSeatTypeBySeatNumber(seat).getCoefficient());
         }
         if (totalPrice > Integer.MAX_VALUE) {
-            throw new IllegalStateException("Total price of the order became more then maximum allowable value");
+            throw new IllegalStateException(TOTAL_PRICE_BECAME_HUGE);
         }
         return (int) totalPrice;
     }
@@ -77,20 +85,22 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public boolean deleteOrder(Long id) {
-        final OrderTable order = repository.findOrderTableById(id).orElseThrow(() -> new EntityNotFoundException("Order by id not found"));
+        final OrderTable order = repository.findOrderByIdTimeTableEager(id)
+                .orElseThrow(() -> new EntityNotFoundException(format(ORDER_NOT_FOUND, id)));
         if (order.getTimeTable().getStartSession().isBefore(LocalDateTime.now())) {
-            return false;
+            throw new IllegalStateException("order.cannot.delete.session.started");
         }
         if (!order.getSeats().isEmpty()) {
             order.getTimeTable().reopenClosedSeats(order.getSeats());
         }
+        repository.deleteById(id);
         return true;
     }
 
     @Override
     @Transactional(readOnly = true)
     public OrderDto getById(Long id) {
-        return converter.toDto(repository.findOrderTableById(id).orElseThrow(() -> new EntityNotFoundException("Order by id not found")));
+        return converter.toDto(repository.findOrderByIdTimeTableEager(id).orElseThrow(() -> new EntityNotFoundException(format(ORDER_NOT_FOUND, id))));
     }
 
 }

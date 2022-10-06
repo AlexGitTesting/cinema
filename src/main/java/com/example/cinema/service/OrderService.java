@@ -1,6 +1,5 @@
 package com.example.cinema.service;
 
-import com.example.cinema.domain.OrderTable;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.OrderDto;
 
@@ -18,11 +17,12 @@ public interface OrderService {
      *
      * @param dto {@link OrderDto}
      * @return created OrderDto
-     * @throws IllegalArgumentException you try save order for movie that has already started
+     * @throws IllegalArgumentException if you try save order for movie that has already started
      * @throws EntityNotFoundException  if {@link TimeTable} related to this Order not found
+     * @throws IllegalStateException    if all seats are sold
      * @see TimeTable#addClosedSeats(Set) will be used to add booked seats
      */
-    OrderDto createOrder(OrderDto dto) throws IllegalArgumentException, EntityNotFoundException;
+    OrderDto createOrder(OrderDto dto) throws IllegalArgumentException, EntityNotFoundException, IllegalStateException;
 
     /**
      * Removes Order.
@@ -30,8 +30,9 @@ public interface OrderService {
      * @param id order's id.
      * @return true if ok.
      * @throws EntityNotFoundException if order not found by id.
+     * @throws IllegalStateException   if you try remove order which session has already started or finished
      */
-    boolean deleteOrder(Long id) throws EntityNotFoundException;
+    boolean deleteOrder(Long id) throws EntityNotFoundException, IllegalStateException;
 
 
     /**
@@ -41,13 +42,5 @@ public interface OrderService {
      * @throws EntityNotFoundException id dto not found
      */
     OrderDto getById(Long id) throws EntityNotFoundException;
-
-    /**
-     * Saves order
-     *
-     * @param order order
-     * @return saved order
-     */
-    OrderTable saveOrder(OrderTable order);
 
 }

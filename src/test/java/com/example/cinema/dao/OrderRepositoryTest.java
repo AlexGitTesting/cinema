@@ -38,7 +38,7 @@ class OrderRepositoryTest extends BaseDataJpaTest {
     @Test
     @Transactional
     void findOrderTableById() {
-        final OrderTable orderTable = assertDoesNotThrow(() -> repository.findOrderTableById(106L).orElseThrow());
+        final OrderTable orderTable = assertDoesNotThrow(() -> repository.findOrderByIdTimeTableEager(106L).orElseThrow());
         assertEquals(1004L, orderTable.getTimeTable().getId());
     }
 

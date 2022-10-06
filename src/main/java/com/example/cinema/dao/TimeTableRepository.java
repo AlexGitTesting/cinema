@@ -20,40 +20,15 @@ import static org.hibernate.jpa.QueryHints.HINT_READONLY;
  */
 @Repository
 public interface TimeTableRepository extends JpaRepository<TimeTable, Long>, JpaSpecificationExecutor<TimeTable> {
-// TODO: 29.09.2022 clean
-
-//    @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
-//    @Query("select t from #{#entityName} as t where t.movie.id=:movieId and t.isSold=false order by t.startSession asc ")
-//    Set<TimeTable> getTimeTableBriefByMovieId(@Param("movieId") @NonNull Long movieId);
-
-
-//    @EntityGraph(attributePaths = {"movie", "cinemaHall"}, type = EntityGraph.EntityGraphType.FETCH)
-//    @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
-//    @Query("select t from #{#entityName} as t where t.movie.id=:movieId and t.isSold=false order by t.startSession asc ")
-//    Set<TimeTable> getTimeTableFullByMovieId(@Param("movieId") @NonNull Long movieId);
-    //TODO: 15.09.2022 is not used
-//    /**
-//     * Checks if timetable exists by cinema hall's id, whose session was in the past
-//     * @param id hall's id
-//     * @return true if exists
-//     */
-//    @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
-//    @Query("select case when count(t.id)>0 then true else false end from" +
-//            " #{#entityName} as t where t.startSession<current_timestamp and t.cinemaHall.id=:id")
-//    boolean ifTimeTableExistsByCinemaHallIdLegacy(long id);
-
-//    @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
-//    @Query("select t.id from  #{#entityName} as t where t.cinemaHall.id=:id")
-//    Set<Long> findByCinemaHallId(Long id);
-//
-//    @Query("delete from #{#entityName} as t where t.cinemaHall.id in:ids")
-//    void deleteByCinemaHallIds(Set<Long> ids);
-//
-//    @EntityGraph(attributePaths = {"cinemaHall"}, type = EntityGraph.EntityGraphType.FETCH)
-//    @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
-//    @Query("select t from #{#entityName} as t where t.id=:tableId ")
-//    Optional<TimeTable> getTimeTableByIdAndCinemaHallOnlyEager(@NonNull Long tableId);
-
+    /**
+     * Gets timetable by id with cinema hall as eager fetching
+     *
+     * @param id timetable's id
+     * @return optional of timetable
+     */
+    @EntityGraph(attributePaths = {"cinemaHall"}, type = EntityGraph.EntityGraphType.FETCH)
+    @Query("select t from #{#entityName} as t where t.id=:id")
+    Optional<TimeTable> getTimeTableByIdEagerCinemaHallOnly(@Param("id") @NonNull Long id);
 
     /**
      * Gets timetable and overrides lazy fetching (movie and cinema hall) to eager.

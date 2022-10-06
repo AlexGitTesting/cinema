@@ -20,6 +20,7 @@ import static java.util.Collections.unmodifiableSet;
 @Entity
 @Table(name = "time_table")
 public class TimeTable extends AuditableEntity {
+    public static final String BOOKED_SEATS_OUT_OF_RANGE = "Booked seats are out of the range of the current cinema hall";
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "movie_id", nullable = false, updatable = false)
     private Movie movie;
@@ -149,7 +150,8 @@ public class TimeTable extends AuditableEntity {
             throw new IllegalArgumentException("seats.already.closed");
         }
         if (!cinemaHall.areSeatsRelatedToCurrentHall(arg)) {
-            throw new IllegalArgumentException("Booked seats are out of the range of the current cinema hall");
+
+            throw new IllegalArgumentException(BOOKED_SEATS_OUT_OF_RANGE);
         }
         closedSeats.addAll(arg);
         if (closedSeats.size() == cinemaHall.getSeatsAmount().intValue()) {
@@ -182,19 +184,24 @@ public class TimeTable extends AuditableEntity {
         if (!(o instanceof TimeTable)) return false;
         if (!super.equals(o)) return false;
         TimeTable timeTable = (TimeTable) o;
-        return getMovie().equals(timeTable.getMovie()) && getCinemaHall().equals(timeTable.getCinemaHall()) && Objects.equals(getStartSession(), timeTable.getStartSession()) && Objects.equals(getBasePrice(), timeTable.getBasePrice()) && Objects.equals(getClosedSeats(), timeTable.getClosedSeats()) && getIsSold().equals(timeTable.getIsSold());
+        return getMovie().getId().equals(timeTable.getMovie().getId())
+                && getCinemaHall().getId().equals(timeTable.getCinemaHall().getId())
+                && Objects.equals(getStartSession(), timeTable.getStartSession())
+                && Objects.equals(getBasePrice(), timeTable.getBasePrice())
+                && Objects.equals(getClosedSeats(), timeTable.getClosedSeats())
+                && getIsSold().equals(timeTable.getIsSold());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getMovie(), getCinemaHall(), getStartSession(), getBasePrice(), getClosedSeats(), getIsSold());
+        return Objects.hash(super.hashCode(), getMovie().getId(), getCinemaHall().getId(), getStartSession(), getBasePrice(), getClosedSeats(), getIsSold());
     }
 
     @Override
     public String toString() {
         return "TimeTable{" +
-                "movie=" + movie +
-                ", cinemaHall=" + cinemaHall +
+                "movie id =" + movie.getId() +
+                ", cinemaHall id =" + cinemaHall.getId() +
                 ", startSession=" + startSession +
                 ", basePrice=" + basePrice +
                 ", closedSeats=" + closedSeats +

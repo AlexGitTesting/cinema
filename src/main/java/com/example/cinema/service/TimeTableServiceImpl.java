@@ -59,7 +59,6 @@ public class TimeTableServiceImpl implements TimeTableService {
         return converter.toDto(repository.save(table));
     }
 
-    // FIXME: 29.09.2022 find usages
     @Override
     @Transactional(readOnly = true)
     public TimeTableDto getByIdEagerAsDto(Long id) {
@@ -81,14 +80,12 @@ public class TimeTableServiceImpl implements TimeTableService {
         return tables.map(converter::toDto);
     }
 
-    //todo for order service
     @Override
     @Transactional
     public TimeTable updateTimeTable(TimeTable table) {
         validateLong(table.getId());
         validateLong(table.getMovie().getId());
         validateLong(table.getCinemaHall().getId());
-        // FIXME: 29.09.2022 validate booked seats
         return repository.save(table);
     }
 
@@ -99,7 +96,6 @@ public class TimeTableServiceImpl implements TimeTableService {
         return repository.ifTimeTableExistsByCinemaHallIdInFuture(id);
     }
 
-    // TODO: 04.10.2022 fix, see usages
     @Override
     @Transactional(readOnly = true)
     public Optional<TimeTable> getByIdOptionalLazy(Long id) {
