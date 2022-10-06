@@ -293,10 +293,7 @@ values (1, create_order_booking_time(1), 1, 3, '[
          7,
          10
        ]', 'customer');
-
-
 update order_table as o
 set order_price=count_total_price_two(o.id::integer)
 where true;
-
-alter sequence time_table_id_seq restart with 51;
+alter sequence order_table_id_seq restart with 51;

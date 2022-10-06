@@ -5,10 +5,8 @@ import com.example.cinema.domain.TimeTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Sql({
         "classpath:statements/insert_cinema_hall.sql",
@@ -27,7 +25,6 @@ class OrderRepositoryTest extends BaseDataJpaTest {
     private OrderRepository repository;
 
     @Test
-    @Transactional
     void create() {
         final TimeTable timeTable = new TimeTable();
         timeTable.setId(1000L);
@@ -36,17 +33,16 @@ class OrderRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void findOrderTableById() {
         final OrderTable orderTable = assertDoesNotThrow(() -> repository.findOrderByIdTimeTableEager(106L).orElseThrow());
         assertEquals(1004L, orderTable.getTimeTable().getId());
     }
 
     @Test
-    @Transactional
     void deleteOrder() {
-        assertDoesNotThrow(() -> repository.deleteById(106L));
-
+        final long id = 106L;
+        assertDoesNotThrow(() -> repository.deleteById(id));
+        assertFalse(repository.findById(id).isPresent());
     }
 
 }

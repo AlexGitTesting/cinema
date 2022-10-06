@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -43,19 +42,16 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     private EntityManager entityManager;
 
     @Test
-    @Transactional
     void getById() {
         assertDoesNotThrow(() -> repository.findById(1007L).orElseThrow());
     }
 
     @Test
-    @Transactional
     void getByIdNotFount() {
         assertThrowsExactly(NoSuchElementException.class, () -> repository.findById(10007L).orElseThrow());
     }
 
     @Test
-    @Transactional
     void deleteByIdCheckCascadeRemovingOrders() {
         final long tableId = 1002L;
         final Optional<OrderTable> order103Before = orderRepository.findOrderByIdTimeTableEager(103L);
@@ -75,7 +71,6 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void updateById() {
         final TimeTable timeTable = repository.findById(1007L).orElseThrow();
         timeTable.setBasePrice((short) 123);
@@ -84,7 +79,6 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void getByFilter() {
         final long movieId = 1001L;
         final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
@@ -98,7 +92,6 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void getByFilter1() {
         final long movieId = 1001L;
         final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
@@ -111,7 +104,6 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void save() {
         EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
         seatsType.put(SeatType.BLIND, new HashSet<>(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 5)));
@@ -125,7 +117,6 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void updateIsClosedTrue() {
         final TimeTable timeTable = assertDoesNotThrow(() -> repository.getTimeTableByIdEagerReadOnly(1015L).orElseThrow());
         final Set<Short> args = Set.of((short) 1, (short) 2, (short) 4, (short) 5);
@@ -138,13 +129,11 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void getTimeTableByIdEager() {
         assertDoesNotThrow(() -> repository.getTimeTableByIdEagerReadOnly(1015L).orElseThrow());
     }
 
     @Test
-    @Transactional
     void getByFilterOld() {
         final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
                 .dateSession(LocalDate.now())
@@ -158,13 +147,11 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void ifTimeTableExistsByMovieIdInFuture() {
         assertTrue(repository.ifTimeTableExistsByMovieIdInFuture(1002L));
     }
 
     @Test
-    @Transactional
     void ifTimeTableExistsByCinemaHallIdInFuture() {
         assertTrue(repository.ifTimeTableExistsByCinemaHallIdInFuture(100L));
     }

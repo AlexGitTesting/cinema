@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,7 +29,6 @@ class CinemaHallRepositoryTest extends BaseDataJpaTest {
     private EntityManager entityManager;
 
     @Test
-    @Transactional
     void save() {
         final CinemaHall red = new CinemaHall(null, "White", (short) 20);
         EnumMap<SeatType, HashSet<Short>> seatsType = new EnumMap<>(SeatType.class);
@@ -38,12 +36,12 @@ class CinemaHallRepositoryTest extends BaseDataJpaTest {
         seatsType.put(SeatType.LUXURY, new HashSet<>(Arrays.asList((short) 6, (short) 7, (short) 8, (short) 9, (short) 10)));
         seatsType.put(SeatType.KISSES, new HashSet<>(Arrays.asList((short) 11, (short) 12, (short) 13, (short) 14, (short) 15, (short) 16
                 , (short) 17, (short) 18, (short) 19, (short) 20)));
+        red.setSeatsType(seatsType);
         final CinemaHall cinemaHall = assertDoesNotThrow(() -> hallRepository.saveAndFlush(red));
         log.info(cinemaHall.toString());
     }
 
     @Test
-    @Transactional
     void findById() {
         final CinemaHall cinemaHall = assertDoesNotThrow(() -> hallRepository.findById(100L).orElseThrow());
         assertNotNull(cinemaHall);
@@ -54,7 +52,6 @@ class CinemaHallRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void update() {
         CinemaHall cinemaHall = assertDoesNotThrow(() -> hallRepository.findById(101L).orElseThrow());
         final String braun = "Braun";
@@ -65,7 +62,6 @@ class CinemaHallRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void delete() {
         hallRepository.deleteById(100L);
         entityManager.flush();

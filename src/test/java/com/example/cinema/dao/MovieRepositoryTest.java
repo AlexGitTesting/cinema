@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,7 +33,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     private EntityManager entityManager;
 
     @Test
-    @Transactional
     void getMovieById() {
         final Optional<Movie> byId = movieRepository.findById(1000L);
         final Movie movie = assertDoesNotThrow((ThrowingSupplier<Movie>) byId::orElseThrow);
@@ -44,7 +42,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void getMovieByIdNotFound() {
         final Optional<Movie> byId = movieRepository.findById(10L);
         assertThrowsExactly(NoSuchElementException.class, byId::orElseThrow);
@@ -52,7 +49,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void saveMovie() {
         final Movie movie = new Movie(null, "Batman Begins", (short) 75, "Christopher Nolan");
         final Movie movie1 = movieRepository.saveAndFlush(movie);
@@ -61,7 +57,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     void updateMovie() {
         final String newTitle = "Dunkirk";
         final Optional<Movie> byId = movieRepository.findById(1000L);
@@ -74,7 +69,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     @Sql({
             "classpath:statements/insert_cinema_hall.sql",
             "classpath:statements/insert_movie.sql",
@@ -95,7 +89,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     @Sql({
             "classpath:statements/insert_cinema_hall.sql",
             "classpath:statements/insert_movie.sql",
@@ -115,7 +108,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     @Sql({
             "classpath:statements/insert_cinema_hall.sql",
             "classpath:statements/insert_movie.sql",
@@ -135,7 +127,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     @Sql({
             "classpath:statements/insert_cinema_hall.sql",
             "classpath:statements/insert_movie.sql",
@@ -156,7 +147,6 @@ class MovieRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
-    @Transactional
     @Sql({
             "classpath:statements/insert_cinema_hall.sql",
             "classpath:statements/insert_movie.sql",
@@ -173,8 +163,5 @@ class MovieRepositoryTest extends BaseDataJpaTest {
         assertFalse(movies.getContent().isEmpty());
         movies.forEach(m -> log.info(m.toString()));
 
-
     }
-
-
 }
