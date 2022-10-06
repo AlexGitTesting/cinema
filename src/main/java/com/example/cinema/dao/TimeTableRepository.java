@@ -21,14 +21,14 @@ import static org.hibernate.jpa.QueryHints.HINT_READONLY;
 @Repository
 public interface TimeTableRepository extends JpaRepository<TimeTable, Long>, JpaSpecificationExecutor<TimeTable> {
     /**
-     * Gets timetable by id with cinema hall as eager fetching
+     * Gets timetable by id with eager fetching for modified operations.
      *
      * @param id timetable's id
      * @return optional of timetable
      */
-    @EntityGraph(attributePaths = {"cinemaHall"}, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = {"cinemaHall", "movie"}, type = EntityGraph.EntityGraphType.FETCH)
     @Query("select t from #{#entityName} as t where t.id=:id")
-    Optional<TimeTable> getTimeTableByIdEagerCinemaHallOnly(@Param("id") @NonNull Long id);
+    Optional<TimeTable> getTimeTableByIdEagerModified(@Param("id") @NonNull Long id);
 
     /**
      * Gets timetable and overrides lazy fetching (movie and cinema hall) to eager.
@@ -39,7 +39,7 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long>, Jpa
     @EntityGraph(attributePaths = {"movie", "cinemaHall"}, type = EntityGraph.EntityGraphType.FETCH)
     @QueryHints(@QueryHint(name = HINT_READONLY, value = "true"))
     @Query("select t from #{#entityName} as t where t.id=:id")
-    Optional<TimeTable> getTimeTableByIdEager(@Param("id") @NonNull Long id);
+    Optional<TimeTable> getTimeTableByIdEagerReadOnly(@Param("id") @NonNull Long id);
 
     /**
      * Checks if timetable exists by cinema hall id and session starts after current moment

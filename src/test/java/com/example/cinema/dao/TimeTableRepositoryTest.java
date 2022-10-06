@@ -127,7 +127,7 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     @Test
     @Transactional
     void updateIsClosedTrue() {
-        final TimeTable timeTable = assertDoesNotThrow(() -> repository.getTimeTableByIdEager(1015L).orElseThrow());
+        final TimeTable timeTable = assertDoesNotThrow(() -> repository.getTimeTableByIdEagerReadOnly(1015L).orElseThrow());
         final Set<Short> args = Set.of((short) 1, (short) 2, (short) 4, (short) 5);
         timeTable.addClosedSeats(args);
         final TimeTable timeTable1 = assertDoesNotThrow(() -> repository.saveAndFlush(timeTable));
@@ -140,7 +140,7 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     @Test
     @Transactional
     void getTimeTableByIdEager() {
-        assertDoesNotThrow(() -> repository.getTimeTableByIdEager(1015L).orElseThrow());
+        assertDoesNotThrow(() -> repository.getTimeTableByIdEagerReadOnly(1015L).orElseThrow());
     }
 
     @Test
@@ -171,6 +171,14 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
 
     @Test
     void getTimeTableByIdEagerCinemaHallOnly() {
-        // TODO: 06.10.2022  test
+        final Optional<TimeTable> table = repository.getTimeTableByIdEagerModified(1010L);
+        assertTrue(table.isPresent());
+        assertDoesNotThrow(() -> table.get().getCinemaHall().getSeatsAmount());
+//        assertDoesNotThrow(()->table.get().getMovie().getProducer());
+//        final PersistenceUnitUtil util = entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
+//        final boolean cinemaHall = util.isLoaded(table.get(), "cinemaHall");
+//        final boolean loaded = util.isLoaded(table.get().getCinemaHall());
+//        final boolean movie = util.isLoaded(table.get(), "movie");
+//        final boolean loaded1 = util.isLoaded(table.get().getMovie());
     }
 }

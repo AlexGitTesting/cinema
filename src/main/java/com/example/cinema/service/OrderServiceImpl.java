@@ -42,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto createOrder(OrderDto dto) {
         validator.validate(dto, OrderDto.class.getSimpleName());
-        final TimeTable timeTable = timeTableRepository.getTimeTableByIdEagerCinemaHallOnly(dto.getTimeTableId())
+        final TimeTable timeTable = timeTableRepository.getTimeTableByIdEagerModified(dto.getTimeTableId())
                 .orElseThrow(() ->
                         new EntityNotFoundException(format(TABLE_NOT_FOUND, dto.getTimeTableId()))
                 );

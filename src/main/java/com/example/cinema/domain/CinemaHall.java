@@ -134,7 +134,7 @@ public class CinemaHall extends AuditableEntity {
             throw new IllegalArgumentException(" field.error.empty.collection");
         }
         return candidates.stream()
-                .allMatch(candidate -> seatsType.values().stream().anyMatch(group -> group.contains(candidate)));
+                .allMatch(candidate -> getSeatsType().values().stream().anyMatch(group -> group.contains(candidate)));
     }
 
 

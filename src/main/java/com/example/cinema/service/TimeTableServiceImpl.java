@@ -62,7 +62,7 @@ public class TimeTableServiceImpl implements TimeTableService {
     @Override
     @Transactional(readOnly = true)
     public TimeTableDto getByIdEagerAsDto(Long id) {
-        final TimeTable timeTable = repository.getTimeTableByIdEager(id).orElseThrow(() -> new EntityNotFoundException("TimeTable not found by id = " + id));
+        final TimeTable timeTable = repository.getTimeTableByIdEagerReadOnly(id).orElseThrow(() -> new EntityNotFoundException("TimeTable not found by id = " + id));
         return converter.toDto(timeTable);
     }
 
@@ -70,7 +70,7 @@ public class TimeTableServiceImpl implements TimeTableService {
     @Transactional(readOnly = true)
     public TimeTable getByIdEager(Long id) {
         validateLong(id);
-        return repository.getTimeTableByIdEager(id).orElseThrow(() -> new EntityNotFoundException("TimeTable not found by id = " + id));
+        return repository.getTimeTableByIdEagerReadOnly(id).orElseThrow(() -> new EntityNotFoundException("TimeTable not found by id = " + id));
     }
 
     @Override
