@@ -39,25 +39,25 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ValidationCustomException.class)
-    public ResponseEntity<Object> handle(final ValidationCustomException e) {
+    public ResponseEntity<String> handle(final ValidationCustomException e) {
         return ResponseEntity.badRequest().body(makeResponseMessage(e));
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handle(final EntityNotFoundException e) {
+    public ResponseEntity<String> handle(final EntityNotFoundException e) {
         return ResponseEntity.status(404).body(getBody(e));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handle(final IllegalArgumentException e) {
+    public ResponseEntity<String> handle(final IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(getBody(e));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CustomConstraintException.class)
-    public ResponseEntity<Object> handle(final CustomConstraintException e) {
+    public ResponseEntity<String> handle(final CustomConstraintException e) {
         return ResponseEntity.badRequest().body(getMessageSourceAccessor().getMessage(e.getCustomMessage()
                 , e.getArgs()
                 , e.getMessage()
@@ -66,7 +66,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Object> handle(final IllegalStateException e) {
+    public ResponseEntity<String> handle(final IllegalStateException e) {
         return ResponseEntity.badRequest().body(getBody(e));
     }
 
