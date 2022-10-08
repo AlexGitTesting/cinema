@@ -5,6 +5,8 @@ import com.example.cinema.domain.CinemaHall;
 import com.example.cinema.domain.Movie;
 import com.example.cinema.domain.OrderTable;
 import com.example.cinema.domain.TimeTable;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,7 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
     }
 
     @Test
+    @DisplayName("Delete time table & verify removing related orders")
     void deleteByIdCheckCascadeRemovingOrders() {
         final long tableId = 1002L;
         final Optional<OrderTable> order103Before = orderRepository.findOrderByIdTimeTableEager(103L);
@@ -70,12 +73,21 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
 
     }
 
-    @Test
-    void updateById() {
-        final TimeTable timeTable = repository.findById(1007L).orElseThrow();
-        timeTable.setBasePrice((short) 123);
-        final TimeTable save = repository.save(timeTable);
-        assertEquals((short) 123, save.getBasePrice());
+    @Nested
+    @DisplayName("Updates time table")
+    public class Update {
+
+        @Test
+        @DisplayName("Check if cinema hall and movie are updated")
+        void updateByIdEager() {
+            final TimeTable timeTable = repository.getTimeTableByIdEagerModified(1007L).orElseThrow();
+            timeTable.setBasePrice((short) 123);
+            final Set<Short> seats = Set.of((short) 3, (short) 8);
+            timeTable.addClosedSeats(seats);
+            final TimeTable save = repository.saveAndFlush(timeTable);
+            assertEquals((short) 123, save.getBasePrice());
+            assertTrue(save.getClosedSeats().containsAll(seats));
+        }
     }
 
     @Test

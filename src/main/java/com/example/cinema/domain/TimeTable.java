@@ -20,6 +20,12 @@ import static java.util.Collections.unmodifiableSet;
 @Entity
 @Table(name = "time_table")
 public class TimeTable extends AuditableEntity {
+    {
+        closedSeats = new HashSet<>();
+        isSold = FALSE;
+        basePrice = (short) 0;
+    }
+
     public static final String BOOKED_SEATS_OUT_OF_RANGE = "Booked seats are out of the range of the current cinema hall";
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "movie_id", nullable = false, updatable = false)
@@ -36,13 +42,6 @@ public class TimeTable extends AuditableEntity {
     private final Set<Short> closedSeats;
     @Column(name = "sold", nullable = false)
     private Boolean isSold;
-
-    {
-        closedSeats = new HashSet<>();
-        isSold = FALSE;
-        basePrice = (short) 0;
-    }
-
 
     public TimeTable() {
     }

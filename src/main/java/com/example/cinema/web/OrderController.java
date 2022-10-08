@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.example.cinema.core.ValidatorHelper.validateParam;
 
 @RestController
-@RequestMapping(path = "/order", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "${url.base.order}", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Order controller", description = "Handles HTTP requests connected with order")
 public class OrderController {
     private final OrderService orderService;
@@ -22,7 +22,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Creates new order")
-    @PostMapping(path = "/create.json", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "${url.create}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     OrderDto createOrder(@RequestBody OrderDto dto) {
         return orderService.createOrder(dto);
@@ -30,7 +30,7 @@ public class OrderController {
 
     @Operation(summary = "Gets order by id.", description = "Gets order by id")
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(path = "/{id}/get-order.json")
+    @GetMapping(path = "${url.get-by-id}")
     OrderDto getById(@Parameter(description = "Order id. Not null and greater then 0") @PathVariable("id") Long id) {
         validateParam(id);
         return orderService.getById(id);
@@ -38,7 +38,7 @@ public class OrderController {
 
     @Operation(summary = "Removes order by id")
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/{id}/delete.json")
+    @DeleteMapping(path = "${url.delete}")
     boolean delete(@Parameter(description = "Order id. Not null and greater then 0") @PathVariable("id") Long id) {
         validateParam(id);
         return orderService.deleteOrder(id);

@@ -42,21 +42,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto createOrder(OrderDto dto) {
         validator.validate(dto, OrderDto.class.getSimpleName());
-        final TimeTable timeTable = timeTableRepository.getTimeTableByIdEagerModified(dto.getTimeTableId())
+        TimeTable timetable = timeTableRepository.getTimeTableByIdEagerModified(dto.getTimeTableId())
                 .orElseThrow(() ->
                         new EntityNotFoundException(format(TABLE_NOT_FOUND, dto.getTimeTableId()))
                 );
-        if (timeTable.getIsSold()) {
+        if (timetable.getIsSold()) {
             throw new IllegalStateException("seats.all.sold");
         }
-        if (timeTable.getStartSession().isBefore(LocalDateTime.now())) {
+        if (timetable.getStartSession().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("start.session.already.been");
         }
         OrderTable orderTable = converter.toDomain(dto);
-        timeTable.addClosedSeats(dto.getSeats());
-        orderTable.setOrderPrice(evaluateTotalPrice(timeTable, dto));
-        orderTable.setTimeTable(timeTable);
-        timeTableRepository.save(timeTable);
+        timetable.addClosedSeats(dto.getSeats());
+        timetable = timeTableRepository.save(timetable);
+        orderTable.setTimeTable(timetable);
+        orderTable.setOrderPrice(evaluateTotalPrice(timetable, dto));
         orderTable = repository.save(orderTable);
         return converter.toDto(orderTable);
 

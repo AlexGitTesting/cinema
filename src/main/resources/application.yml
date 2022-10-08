@@ -48,3 +48,7 @@ url:
   get-by-filter: /filter.json
   delete: /{id}/delete.json
 
+server:
+  error:
+    include-message: always
+

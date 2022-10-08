@@ -1,5 +1,6 @@
 package com.example.cinema.web;
 
+import com.example.cinema.config.ProjectProperties;
 import com.example.cinema.dto.OrderDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class OrderControllerTest {
 
-    private static String b = "/movie";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ProjectProperties prop;
 
     @Test
     void createOrder() throws Exception {
@@ -49,7 +51,7 @@ class OrderControllerTest {
                 .timeTableId(1029L)
                 .orderPrice(null)
                 .build();
-        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/order/create.json")
+        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getOrder() + prop.getCreate())
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(order))
                 .accept(APPLICATION_JSON);
@@ -58,13 +60,21 @@ class OrderControllerTest {
 
     @Test
     void getById() throws Exception {
-        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get("/order/{id}/get-order.json", 147).locale(new Locale("uk"));
+        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getOrder() + prop.getGetById(), 147)
+                .locale(new Locale("uk"));
         mockMvc.perform(get).andDo(print()).andExpect(status().isOk());
     }
 
     @Test
+    void getByIdNotValidParam() throws Exception {
+        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getOrder() + prop.getGetById(), -37)
+                .locale(new Locale("uk"));
+        mockMvc.perform(get).andDo(print()).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void delete() throws Exception {
-        final MockHttpServletRequestBuilder delete = MockMvcRequestBuilders.delete("/order/{id}/delete.json", 147);
+        final MockHttpServletRequestBuilder delete = MockMvcRequestBuilders.delete(prop.getBase().getOrder() + prop.getDelete(), 147);
         mockMvc.perform(delete).andDo(print()).andExpect(status().isOk());
     }
 }
