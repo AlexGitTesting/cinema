@@ -45,10 +45,10 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
             @ApiResponse(responseCode = "400", description = "Not valid dto"
                     , content = @Content(schema = @Schema(implementation = String.class)
                     , examples = {@ExampleObject(name = "Validation exception message", value = """
-                    Validation exception: \s
-                    Field: producer,  message: Field must contain at least one non-whitespace symbol,\s
-                    Field: id,  message: The field must be null,\s
-                    Field: title,  message: Field must contain at least one non-whitespace symbol,\s
+                    Validation exception:
+                    Field: producer,  message: Field must contain at least one non-whitespace symbol,
+                    Field: id,  message: The field must be null,
+                    Field: title,  message: Field must contain at least one non-whitespace symbol,
                     Field: timing,  message: The minimal value must be 1,""")}))
     })
     @Override
@@ -141,9 +141,12 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
             @RequestBody(description = "Flag active(true) means that you retrieve movies which sessions will start from this moment only",
                     content = @Content(schema = @Schema(implementation = MovieQueryFilter.class),
                             examples = {
-                                    @ExampleObject(name = "Dark of the moon", description = "At least Dark of the moon must be returned, if you did not remove it.", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":\"of\",\"producer\":null,\"active\":false}"),
-                                    @ExampleObject(name = "Active films", description = "Must not contain movie with id 6", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":null,\"producer\":null,\"active\":true}"),
-                                    @ExampleObject(name = "By producer", description = "Producer is at least Nelson Shin", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":null,\"producer\":\"Nel\",\"active\":false}")
+                                    @ExampleObject(name = "Dark of the moon", description = "At least Dark of the moon must be returned, if you did not remove it.", value = """
+                                            {"page":0,"limit":10,"sortingAscending":false,"title":"of","producer":null,"active":false}"""),
+                                    @ExampleObject(name = "Active films", description = "Must not contain movie with id 6", value = """
+                                            {"page":0,"limit":10,"sortingAscending":false,"title":null,"producer":null,"active":true}"""),
+                                    @ExampleObject(name = "By producer", description = "Producer is at least Nelson Shin", value = """
+                                            {"page":0,"limit":10,"sortingAscending":false,"title":null,"producer":"Nel","active":false}""")
                             }))
                     MovieQueryFilter filter) {
         return service.getByFiler(filter);

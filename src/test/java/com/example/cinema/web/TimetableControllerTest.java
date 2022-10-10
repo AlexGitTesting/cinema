@@ -174,6 +174,26 @@ class TimetableControllerTest {
         }
 
         @Test
+        void createNotValidDto1() throws Exception {
+            final LocalDateTime date = LocalDateTime.now().plusDays(3);
+            final BasisTimeTable table = new BasisTimeTable(-3L, null
+                    , null
+                    , (short) -35);
+            final MockHttpServletRequestBuilder post = post(prop.getBase().getTimeTable() + prop.getCreate()).accept(APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(table));
+            final String content = mockMvc.perform(post)
+                    .andDo(print())
+                    .andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+            assertTrue(content.toLowerCase().contains("Validation exception".toLowerCase())
+                    && content.toLowerCase().contains("movieId".toLowerCase())
+                    && content.toLowerCase().contains("cinemaHallId".toLowerCase())
+                    && content.toLowerCase().contains("startSession".toLowerCase())
+                    && content.toLowerCase().contains("basePrice".toLowerCase())
+            );
+        }
+
+        @Test
         void createValidDto() throws Exception {
             final LocalDateTime date = LocalDateTime.now().plusDays(3);
             final BasisTimeTable table = new BasisTimeTable(1000L, 100L
@@ -184,6 +204,32 @@ class TimetableControllerTest {
             mockMvc.perform(post)
                     .andDo(print())
                     .andExpect(status().isCreated());
+        }
+
+        @Test
+        void createMovieNotFound() throws Exception {
+            final LocalDateTime date = LocalDateTime.now().plusDays(3);
+            final BasisTimeTable table = new BasisTimeTable(1500L, 100L
+                    , date, (short) 35);
+            final MockHttpServletRequestBuilder post = post(prop.getBase().getTimeTable() + prop.getCreate()).accept(APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(table));
+            mockMvc.perform(post)
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void createCinemaHAllNotFound() throws Exception {
+            final LocalDateTime date = LocalDateTime.now().plusDays(3);
+            final BasisTimeTable table = new BasisTimeTable(1000L, 1000L
+                    , date, (short) 35);
+            final MockHttpServletRequestBuilder post = post(prop.getBase().getTimeTable() + prop.getCreate()).accept(APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(table));
+            mockMvc.perform(post)
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
         }
     }
 
