@@ -42,7 +42,14 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
     @Operation(summary = "Creates new movie")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Movie is created", content = @Content(schema = @Schema(implementation = MovieDto.class))),
-            @ApiResponse(responseCode = "400", description = "Not valid dto")
+            @ApiResponse(responseCode = "400", description = "Not valid dto"
+                    , content = @Content(schema = @Schema(implementation = String.class)
+                    , examples = {@ExampleObject(name = "Validation exception message", value = """
+                    Validation exception: \s
+                    Field: producer,  message: Field must contain at least one non-whitespace symbol,\s
+                    Field: id,  message: The field must be null,\s
+                    Field: title,  message: Field must contain at least one non-whitespace symbol,\s
+                    Field: timing,  message: The minimal value must be 1,""")}))
     })
     @Override
     public MovieDto create(@RequestBody(description = "Movie Dto for creation",
@@ -56,16 +63,20 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
         return service.create(dto);
     }
 
-    @Operation(summary = "Gets movie", description = "Gets movie by id")
+    @Operation(summary = "Gets movie by id", description = "Gets movie by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Movie is found", content = @Content(schema = @Schema(implementation = MovieDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid parameter"),
-            @ApiResponse(responseCode = "404", description = "Movie by id not fount")
+            @ApiResponse(responseCode = "400", description = "Invalid parameter",
+                    headers = @Header(name = "Error message", schema = @Schema(implementation = String.class),
+                            description = "Argument is invalid. Number must be not null and greater then 0")),
+            @ApiResponse(responseCode = "404", description = "Movie by id not found",
+                    content = @Content(schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Movie by id not found")))
     })
     @Override
     public MovieDto getById(@Parameter(description = "Movie id. Not null and greater then 0", examples = {
             @ExampleObject(name = "Valid id", value = "1"),
-            @ExampleObject(name = "Invalid id,less 0", value = "-5"),
+            @ExampleObject(name = "Invalid id,less then 0", value = "-5"),
             @ExampleObject(name = "Invalid id, null", value = "null"),
             @ExampleObject(name = "Not found", value = "1500")
     }) Long id) {
@@ -76,8 +87,16 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
     @Operation(summary = "Updates existed movie")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Movie is updated", content = @Content(schema = @Schema(implementation = MovieDto.class))),
-            @ApiResponse(responseCode = "400", description = "Not valid dto"),
-            @ApiResponse(responseCode = "404", description = "Movie by id not fount")})
+            @ApiResponse(responseCode = "400", description = "Not valid dto", content = @Content(schema = @Schema(implementation = String.class)
+                    , examples = {@ExampleObject(name = "Validation exception message", value = """
+                    Validation exception: \s
+                    Field: producer,  message: Field must contain at least one non-whitespace symbol,\s
+                    Field: id,  message: The field must be null,\s
+                    Field: title,  message: Field must contain at least one non-whitespace symbol,\s
+                    Field: timing,  message: The minimal value must be 1,""")})),
+            @ApiResponse(responseCode = "404", description = "Movie by id not fount",
+                    content = @Content(schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Movie by id not found")))})
     @Override
     public MovieDto update(@RequestBody(description = "Movie dto for updating",
             content = @Content(examples = {
@@ -93,10 +112,14 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
         return service.update(dto);
     }
 
+    @Operation(summary = "Removes existed movie by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class), examples = @ExampleObject(value = "\"Movie has removed successfully\""))),
-            @ApiResponse(responseCode = "400", headers = @Header(name = "Error message", schema = @Schema(implementation = String.class, example = "Argument is invalid. Number must be not null and greater then 0"))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = String.class, example = "Movie is not found by id")))
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class),
+                    examples = @ExampleObject(value = "Movie has removed successfully"))),
+            @ApiResponse(responseCode = "400", headers = @Header(name = "Error message",
+                    schema = @Schema(implementation = String.class), description = "Argument is invalid. Number must be not null and greater then 0")),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = String.class),
+                    examples = @ExampleObject(value = "Movie is not found by id")))
     })
     @Override
     public ResponseEntity<Object> delete(@Parameter(description = "Movie id. Not null and greater then 0", examples = {
@@ -118,9 +141,9 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
             @RequestBody(description = "Flag active(true) means that you retrieve movies which sessions will start from this moment only",
                     content = @Content(schema = @Schema(implementation = MovieQueryFilter.class),
                             examples = {
-                                    @ExampleObject(name = "Dark of the moon", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":\"of\",\"producer\":null,\"active\":false}"),
-                                    @ExampleObject(description = "Must not contain movie with id 6", name = "Active films", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":null,\"producer\":null,\"active\":true}"),
-                                    @ExampleObject(description = "Producer is at least Nelson Shin", name = "By producer", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":null,\"producer\":\"Nel\",\"active\":false}")
+                                    @ExampleObject(name = "Dark of the moon", description = "At least Dark of the moon must be returned, if you did not remove it.", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":\"of\",\"producer\":null,\"active\":false}"),
+                                    @ExampleObject(name = "Active films", description = "Must not contain movie with id 6", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":null,\"producer\":null,\"active\":true}"),
+                                    @ExampleObject(name = "By producer", description = "Producer is at least Nelson Shin", value = "{\"page\":0,\"limit\":10,\"sortingAscending\":false,\"title\":null,\"producer\":\"Nel\",\"active\":false}")
                             }))
                     MovieQueryFilter filter) {
         return service.getByFiler(filter);
