@@ -56,9 +56,10 @@ public interface MovieService {
      * Removes movie by id, if there are not timetables that are referring to this one
      *
      * @param id movie id
-     * @return true if all went good
-     * @throws IllegalArgumentException if movie is still referenced
+     * @return true if all went well
+     * @throws IllegalArgumentException if the movie is still referenced
+     * @throws EntityNotFoundException  if the movie by id not found
      */
-    boolean delete(Long id) throws IllegalArgumentException;
+    boolean delete(Long id) throws IllegalArgumentException, EntityNotFoundException;
 
 }

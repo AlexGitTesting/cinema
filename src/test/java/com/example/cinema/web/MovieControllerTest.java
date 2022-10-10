@@ -174,9 +174,18 @@ class MovieControllerTest {
         }
     }
 
-    @Test
-    void delete() throws Exception {
-        final MockHttpServletRequestBuilder biuld = MockMvcRequestBuilders.delete(prop.getBase().getMovie() + "" + prop.getDelete(), 1005);
-        mockMvc.perform(biuld).andDo(print()).andExpect(status().isOk());
+    @Nested
+    class DeleteMovie {
+        @Test
+        void delete() throws Exception {
+            final MockHttpServletRequestBuilder biuld = MockMvcRequestBuilders.delete(prop.getBase().getMovie() + "" + prop.getDelete(), 1005);
+            mockMvc.perform(biuld).andDo(print()).andExpect(status().isOk());
+        }
+
+        @Test
+        void deleteNotFound() throws Exception {
+            final MockHttpServletRequestBuilder biuld = MockMvcRequestBuilders.delete(prop.getBase().getMovie() + "" + prop.getDelete(), 1500);
+            mockMvc.perform(biuld).andDo(print()).andExpect(status().isNotFound());
+        }
     }
 }

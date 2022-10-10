@@ -10,6 +10,7 @@ import com.example.cinema.domain.Movie;
 import com.example.cinema.dto.MovieDto;
 import com.example.cinema.service.converters.MovieConverter;
 import com.example.cinema.service.validator.ValidationService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
@@ -72,7 +73,11 @@ public class MovieServiceImpl implements MovieService {
         if (tableRepository.ifTimeTableExistsByMovieIdInFuture(id)) {
             throw new IllegalArgumentException("movie.can.not.remove");
         }
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EntityNotFoundException("not.found.movie");
+        }
         return true;
     }
 

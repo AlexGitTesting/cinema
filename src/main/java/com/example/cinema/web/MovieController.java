@@ -8,6 +8,7 @@ import com.example.cinema.dto.MovieDto;
 import com.example.cinema.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -92,12 +93,17 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
         return service.update(dto);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class), examples = @ExampleObject(value = "\"Movie has removed successfully\""))),
+            @ApiResponse(responseCode = "400", headers = @Header(name = "Error message", schema = @Schema(implementation = String.class, example = "Argument is invalid. Number must be not null and greater then 0"))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = String.class, example = "Movie is not found by id")))
+    })
     @Override
     public ResponseEntity<Object> delete(@Parameter(description = "Movie id. Not null and greater then 0", examples = {
             @ExampleObject(name = "Valid id", value = "6"),
             @ExampleObject(name = "Invalid id,less 0", value = "-5"),
             @ExampleObject(name = "Invalid id, null", value = "null"),
-            @ExampleObject(name = "Not found", value = "1500") // TODO: 09.10.2022 catch exception in service
+            @ExampleObject(name = "Not found", value = "1500")
     }) Long id) {
         validateParam(id);
         service.delete(id);
