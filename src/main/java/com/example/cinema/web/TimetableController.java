@@ -8,6 +8,9 @@ import com.example.cinema.dto.TimeTableDto;
 import com.example.cinema.service.TimeTableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -35,7 +38,7 @@ public class TimetableController implements GetByIdContract<TimeTableDto>, Filte
     @Operation(summary = "Creates new timetable")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "${url.create}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    TimeTableDto create(@RequestBody BasisTimeTable dto) {
+    TimeTableDto create(@io.swagger.v3.oas.annotations.parameters.RequestBody(content = {@Content(schema = @Schema(implementation = BasisTimeTable.class))}) @RequestBody BasisTimeTable dto) {
         return service.createNew(dto);
     }
 
@@ -46,6 +49,7 @@ public class TimetableController implements GetByIdContract<TimeTableDto>, Filte
         return service.getByIdEagerAsDto(id);
     }
 
+    @ApiResponse(content = {@Content(schema = @Schema(implementation = TimeTableDto.class))})
     @Operation(summary = "Searches timetable by filter")
     @Override
     public Page<TimeTableDto> getByFilter(TimeTableQueryFilter filter) {

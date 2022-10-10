@@ -37,7 +37,7 @@ class MovieServiceTest {
 
     @Test
     void getByFiler() {
-        final MovieQueryFilter filter = MovieQueryFilter.builder().isActive(false).page(0).limit(10).build();
+        final MovieQueryFilter filter = MovieQueryFilter.builder().active(false).page(0).limit(10).build();
         final Page<MovieDto> movies = service.getByFiler(filter);
         assertTrue(movies.getTotalElements() >= 5);
         assertTrue(movies.stream().mapToLong(g -> g.getId().orElseThrow()).anyMatch(id -> id == 1004L || id == 1001L));

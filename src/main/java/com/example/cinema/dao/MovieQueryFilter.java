@@ -25,7 +25,7 @@ public class MovieQueryFilter implements Serializable, FilterMarker {
     /**
      * false- all movies, true the session will be started from the current time
      */
-    private final boolean isActive;
+    private final boolean active;
 
     private MovieQueryFilter(Builder builder) {
         this.page = builder.page == null || builder.page < 0 ? 0 : builder.page;
@@ -33,7 +33,7 @@ public class MovieQueryFilter implements Serializable, FilterMarker {
         this.sortingAscending = builder.sortingAscending;
         this.title = builder.title;
         this.producer = builder.producer;
-        this.isActive = builder.notStarted;
+        this.active = builder.active;
     }
 
 
@@ -62,7 +62,7 @@ public class MovieQueryFilter implements Serializable, FilterMarker {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class MovieQueryFilter implements Serializable, FilterMarker {
         private boolean sortingAscending;
         private String title;
         private String producer;
-        private boolean notStarted;
+        private boolean active;
 
         public MovieQueryFilter.Builder page(final Integer page) {
             this.page = page;
@@ -111,8 +111,8 @@ public class MovieQueryFilter implements Serializable, FilterMarker {
             return this;
         }
 
-        public MovieQueryFilter.Builder isActive(final boolean notStarted) {
-            this.notStarted = notStarted;
+        public Builder active(final boolean active) {
+            this.active = active;
             return this;
         }
 

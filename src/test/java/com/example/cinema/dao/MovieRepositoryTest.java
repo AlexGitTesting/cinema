@@ -80,7 +80,7 @@ class MovieRepositoryTest extends BaseDataJpaTest {
             "classpath:statements/truncate_cinema_hall.sql"
     })
     void getByFilerContainsNotActiveMovies() {
-        final MovieQueryFilter filter = MovieQueryFilter.builder().isActive(false).page(0).limit(10).build();
+        final MovieQueryFilter filter = MovieQueryFilter.builder().active(false).page(0).limit(10).build();
         final List<Movie> movies = movieRepository.findAll(specification.getByFilter(filter));
         assertTrue(movies.size() >= 5);
         assertTrue(movies.stream().mapToLong(BaseEntity::getId).anyMatch(id -> id == 1004L));
@@ -100,7 +100,7 @@ class MovieRepositoryTest extends BaseDataJpaTest {
             "classpath:statements/truncate_cinema_hall.sql"
     })
     void getByFilerContainsActiveMoviesOnly() {
-        final MovieQueryFilter filter = MovieQueryFilter.builder().isActive(true).page(0).limit(10).build();
+        final MovieQueryFilter filter = MovieQueryFilter.builder().active(true).page(0).limit(10).build();
         final List<Movie> movies = movieRepository.findAll(specification.getByFilter(filter));
         assertTrue(movies.size() >= 3);
         assertTrue(movies.stream().mapToLong(BaseEntity::getId).noneMatch(id -> id == 1005L));
@@ -158,7 +158,7 @@ class MovieRepositoryTest extends BaseDataJpaTest {
             "classpath:statements/truncate_cinema_hall.sql"
     })
     void getByFilerPaginationNotThrow() {
-        final MovieQueryFilter filter = MovieQueryFilter.builder().isActive(false).page(1).limit(2).build();
+        final MovieQueryFilter filter = MovieQueryFilter.builder().active(false).page(1).limit(2).build();
         final Page<Movie> movies = assertDoesNotThrow(() -> movieRepository.findAll(specification.getByFilter(filter), PageRequest.of(filter.getPage(), filter.getLimit())));
         assertFalse(movies.getContent().isEmpty());
         movies.forEach(m -> log.info(m.toString()));

@@ -39,13 +39,13 @@ public class MovieSpecificationImpl implements MovieSpecification {
     }
 
     /**
-     * SubQuery to find movie's ids that are active
+     * SubQuery to find movie's ids which sessions will start from this moment
      */
     private Subquery<Long> findActiveFilmsFromTimeTable(CriteriaBuilder cb, CriteriaQuery<?> query) {
         final Subquery<Long> subQuery = query.subquery(Long.class);
         final Root<TimeTable> root = subQuery.from(TimeTable.class);
         final Path<LocalDateTime> path = root.get(TimeTable_.startSession);
-        return subQuery.select(root.get(TimeTable_.movie).get(Movie_.id)).where(cb.greaterThan(path, LocalDateTime.now())).distinct(true);
+        return subQuery.select(root.get(TimeTable_.movie).get(Movie_.id)).where(cb.greaterThan(path, cb.literal(LocalDateTime.now()))).distinct(true);
     }
 
     private void addPredicateIfExists(final List<Predicate> predicates, final String field, Path<String> path, final CriteriaBuilder cb) {
