@@ -122,7 +122,7 @@ public class MovieController implements CreateUpdateContract<MovieDto>, DeleteCo
                     examples = @ExampleObject(value = "Movie is not found by id")))
     })
     @Override
-    public ResponseEntity<Object> delete(@Parameter(description = "Movie id. Not null and greater then 0", examples = {
+    public ResponseEntity<String> delete(@Parameter(description = "Movie id. Not null and greater then 0", examples = {
             @ExampleObject(name = "Valid id", value = "6"),
             @ExampleObject(name = "Invalid id,less 0", value = "-5"),
             @ExampleObject(name = "Invalid id, null", value = "null"),

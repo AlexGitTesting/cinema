@@ -18,5 +18,5 @@ public interface DeleteContract {
     @Operation(summary = "Removes entity by id")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = "${url.delete}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Object> delete(@PathVariable(name = "id") Long id);
+    ResponseEntity<String> delete(@PathVariable(name = "id") Long id);
 }

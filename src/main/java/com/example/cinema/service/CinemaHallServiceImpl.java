@@ -54,7 +54,7 @@ public class CinemaHallServiceImpl implements CinemaHallService {
 
     @Override
     @Transactional
-    public CinemaHallDto update(CinemaHallDto dto) throws CustomConstraintException {
+    public CinemaHallDto update(CinemaHallDto dto) {
         validator.validate(dto, CinemaHallDto.class.getSimpleName(), RequiredFieldsForUpdating.class);
         if (tableService.ifTimeTableExistsByCinemaHallIdInFuture(dto.id())) {
             throw new IllegalArgumentException(CAN_NOT_UPDATE);
