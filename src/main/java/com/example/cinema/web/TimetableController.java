@@ -8,6 +8,7 @@ import com.example.cinema.dto.TimeTableDto;
 import com.example.cinema.service.TimeTableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -73,16 +74,37 @@ public class TimetableController implements GetByIdContract<TimeTableDto>, Filte
     }
 
     @Operation(summary = "Gets timetable", description = "Gets timetable by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Timetable is found", content = @Content(schema = @Schema(implementation = TimeTableDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameter",
+                    headers = @Header(name = "Error message", schema = @Schema(implementation = String.class),
+                            description = "Argument is invalid. Number must be not null and greater then 0")),
+            @ApiResponse(responseCode = "404", description = "Timetable by id not found",
+                    content = @Content(schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Timetable by id not found")))
+    })
     @Override
-    public TimeTableDto getById(@Parameter(description = "Timetable id. Not null and greater then 0") Long id) {
+    public TimeTableDto getById(@Parameter(description = "Timetable id. Not null and greater then 0", examples = {
+            @ExampleObject(name = "Valid id", value = "1"),
+            @ExampleObject(name = "Invalid id,less then 0", value = "-5"),
+            @ExampleObject(name = "Invalid id, null", value = "null"),
+            @ExampleObject(name = "Not found", value = "2000")
+    }) Long id) {
         validateParam(id);
         return service.getByIdEagerAsDto(id);
     }
 
-    @ApiResponse(content = {@Content(schema = @Schema(implementation = TimeTableDto.class))})
+    @ApiResponse(responseCode = "200", description = "Timetable is found", content = {@Content(schema = @Schema(implementation = TimeTableDto.class))})
     @Operation(summary = "Searches timetable by filter")
     @Override
-    public Page<TimeTableDto> getByFilter(TimeTableQueryFilter filter) {
+    public Page<TimeTableDto> getByFilter(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = """
+            Filter for searching time table. If date session is specified,
+            then timetables for that day will be shown, otherwise timetables whose start session is after then current moment""",
+            content = @Content(schema = @Schema(implementation = TimeTableQueryFilter.class),
+                    examples = {
+                            @ExampleObject(name = "By movie id", value = "{\"page\":0,\"limit\":2,\"dateSession\":null,\"movieId\":1}"),
+                            @ExampleObject(name = "By date session", value = "{\"page\":0,\"limit\":2,\"dateSession\":\"2022-10-11\",\"movieId\":null}")
+                    })) TimeTableQueryFilter filter) {
         return service.getByFiler(filter);
     }
 }
