@@ -3,6 +3,7 @@ package com.example.cinema.web;
 import com.example.cinema.config.ProjectProperties;
 import com.example.cinema.dto.OrderDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -42,34 +44,57 @@ class OrderControllerTest {
     @Autowired
     private ProjectProperties prop;
 
-    @Test
-    void createOrder() throws Exception {
-        final OrderDto order = OrderDto.builder()
-                .customer("customer")
-                .id(null)
-                .seats(Set.of((short) 1, (short) 5, (short) 4))
-                .timeTableId(1029L)
-                .orderPrice(null)
-                .build();
-        final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getOrder() + prop.getCreate())
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(order))
-                .accept(APPLICATION_JSON);
-        mockMvc.perform(post).andDo(print()).andExpect(status().isCreated());
+    @Nested
+    class CreateOrder {
+        @Test
+        void createOrder() throws Exception {
+            final OrderDto order = OrderDto.builder()
+                    .customer("customer")
+                    .id(null)
+                    .seats(Set.of((short) 1, (short) 5, (short) 4))
+                    .timeTableId(1029L)
+                    .orderPrice(null)
+                    .build();
+            final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getOrder() + prop.getCreate())
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(order))
+                    .accept(APPLICATION_JSON);
+            mockMvc.perform(post).andDo(print()).andExpect(status().isCreated());
+        }
+
+        @Test
+        void createOrderNotValidDto() throws Exception {
+            final OrderDto order = OrderDto.builder()
+                    .customer("customer")
+                    .id(1L)
+                    .seats(Collections.emptySet())
+                    .timeTableId(null)
+                    .orderPrice(20)
+                    .customer("  ")
+                    .build();
+            final MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post(prop.getBase().getOrder() + prop.getCreate())
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(order))
+                    .accept(APPLICATION_JSON);
+            mockMvc.perform(post).andDo(print()).andExpect(status().isBadRequest());
+        }
     }
 
-    @Test
-    void getById() throws Exception {
-        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getOrder() + prop.getGetById(), 147)
-                .locale(new Locale("uk"));
-        mockMvc.perform(get).andDo(print()).andExpect(status().isOk());
-    }
+    @Nested
+    class OrderGetById {
+        @Test
+        void getById() throws Exception {
+            final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getOrder() + prop.getGetById(), 147)
+                    .locale(new Locale("uk"));
+            mockMvc.perform(get).andDo(print()).andExpect(status().isOk());
+        }
 
-    @Test
-    void getByIdNotValidParam() throws Exception {
-        final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getOrder() + prop.getGetById(), -37)
-                .locale(new Locale("uk"));
-        mockMvc.perform(get).andDo(print()).andExpect(status().isBadRequest());
+        @Test
+        void getByIdNotValidParam() throws Exception {
+            final MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get(prop.getBase().getOrder() + prop.getGetById(), -37)
+                    .locale(new Locale("uk"));
+            mockMvc.perform(get).andDo(print()).andExpect(status().isBadRequest());
+        }
     }
 
     @Test

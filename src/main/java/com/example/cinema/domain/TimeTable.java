@@ -142,15 +142,14 @@ public class TimeTable extends AuditableEntity {
         if (arg.isEmpty()) {
             throw new IllegalArgumentException("Booked seats are empty");
         }
+        if (!cinemaHall.areSeatsRelatedToCurrentHall(arg)) {
+            throw new IllegalArgumentException(BOOKED_SEATS_OUT_OF_RANGE);
+        }
         if (closedSeats.size() + arg.size() > getCinemaHall().getSeatsAmount().intValue()) {
             throw new IllegalArgumentException("Amount of the booked seats are greater then total amount of seats of the current cinema hall.");
         }
         if (arg.stream().anyMatch(closedSeats::contains)) {
             throw new IllegalArgumentException("seats.already.closed");
-        }
-        if (!cinemaHall.areSeatsRelatedToCurrentHall(arg)) {
-
-            throw new IllegalArgumentException(BOOKED_SEATS_OUT_OF_RANGE);
         }
         closedSeats.addAll(arg);
         if (closedSeats.size() == cinemaHall.getSeatsAmount().intValue()) {
