@@ -30,7 +30,7 @@ public class OrderController {
 
     @Operation(summary = "Creates new order")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Order is created", content = @Content(schema = @Schema(implementation = OrderHumanDto.class))),
+            @ApiResponse(responseCode = "201", description = "Order is created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderHumanDto.class))),
             @ApiResponse(responseCode = "400", description = "Not valid dto"
                     , content = @Content(schema = @Schema(implementation = String.class)
                     , examples = {
@@ -67,14 +67,14 @@ public class OrderController {
                             {"id":null,"timeTableId":31,"orderPrice":null,"seats":[1,4],"customer":"customer"}"""),
                     @ExampleObject(name = "Not valid dto", value = """
                             {"id":1,"timeTableId":null,"orderPrice":45,"seats":[],"customer":"  "}""")
-            })
+            }, mediaType = "application/json")
     ) @RequestBody OrderDto dto) {
         return orderService.createOrder(dto);
     }
 
     @Operation(summary = "Gets order by id.", description = "Gets order by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Order is found", content = @Content(schema = @Schema(implementation = OrderHumanDto.class))),
+            @ApiResponse(responseCode = "200", description = "Order is found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderHumanDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameter",
                     headers = @Header(name = "Error message", schema = @Schema(implementation = String.class),
                             description = "Argument is invalid. Number must be not null and greater then 0")),
@@ -84,7 +84,7 @@ public class OrderController {
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(path = "${url.get-by-id}")
-    OrderHumanDto getById(@Parameter(description = "Order id. Not null and greater then 0", examples = {
+    OrderHumanDto getById(@Parameter(description = "Order id. Not null and greater then 0", schema = @Schema(implementation = Long.class), examples = {
             @ExampleObject(name = "Valid id", value = "1"),
             @ExampleObject(name = "Invalid id,less then 0", value = "-5"),
             @ExampleObject(name = "Invalid id, null", value = "null"),
@@ -105,7 +105,7 @@ public class OrderController {
     })
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(path = "${url.delete}")
-    boolean delete(@Parameter(description = "Order id. Not null and greater then 0", examples = {
+    boolean delete(@Parameter(schema = @Schema(implementation = Long.class), description = "Order id. Not null and greater then 0", examples = {
             @ExampleObject(name = "Valid id", value = "1"),
             @ExampleObject(name = "Invalid id,less then 0", value = "-5"),
             @ExampleObject(name = "Invalid id, null", value = "null"),
