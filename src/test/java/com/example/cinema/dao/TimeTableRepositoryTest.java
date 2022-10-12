@@ -90,29 +90,76 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
         }
     }
 
-    @Test
-    void getByFilter() {
-        final long movieId = 1001L;
-        final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
-                .dateSession(LocalDate.now().plusDays(1L))
-                .movieId(movieId)
-                .build();
-        final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
-        assertFalse(all.isEmpty());
-        assertTrue(all.stream().allMatch(timeTable -> timeTable.getMovie().getId().equals(movieId)));
+    @Nested
+    class GetByFilter {
+        @Test
+        void getByFilterContainsSoldTimeTables() {
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder().build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            assertTrue(all.stream().anyMatch(tt -> tt.getIsSold().equals(Boolean.FALSE)));
+            assertTrue(all.stream().anyMatch(tt -> tt.getIsSold().equals(Boolean.TRUE)));
+        }
 
-    }
+        @Test
+        void getByFilterContainsSoldTimeTablesAndDate() {
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder().dateSession(LocalDate.now()).build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            assertTrue(all.stream().anyMatch(tt -> tt.getMovie().getId() == 1004));
 
-    @Test
-    void getByFilter1() {
-        final long movieId = 1001L;
-        final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
-                .movieId(1001L)
-                .build();
-        final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
-        assertFalse(all.isEmpty());
-        assertTrue(all.stream().allMatch(timeTable -> timeTable.getMovie().getId().equals(movieId)));
+        }
 
+        @Test
+        void getByFilterNotContainsSoldTimeTablesAndDate() {
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder().hasFreeSeats(Boolean.TRUE).dateSession(LocalDate.now()).build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            assertTrue(all.stream().noneMatch(tt -> tt.getMovie().getId() == 1004));
+
+        }
+
+        @Test
+        void getByFilterHasFreeSeatsOnly() {
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder().hasFreeSeats(Boolean.TRUE).build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            assertTrue(all.stream().allMatch(tt -> tt.getIsSold().equals(Boolean.FALSE)));
+        }
+
+        @Test
+        void getByFilterByMovieAndDate() {
+            final long movieId = 1001L;
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
+                    .dateSession(LocalDate.now().plusDays(1L))
+                    .movieId(movieId)
+                    .build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            assertFalse(all.isEmpty());
+            assertTrue(all.stream().allMatch(timeTable -> timeTable.getMovie().getId().equals(movieId)));
+
+        }
+
+        @Test
+        void getByFilterByMovie() {
+            final long movieId = 1001L;
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
+                    .movieId(1001L)
+                    .build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            assertFalse(all.isEmpty());
+            assertTrue(all.stream().allMatch(timeTable -> timeTable.getMovie().getId().equals(movieId)));
+
+        }
+
+        @Test
+        void getByFilterOld() {
+            final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
+                    .dateSession(LocalDate.now())
+                    .build();
+            final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
+            final Set<TimeTable> collect = all.stream()
+                    .filter(a -> a.getStartSession().isBefore(LocalDateTime.now()))
+                    .collect(Collectors.toSet());
+            collect.forEach(g -> log.info(g.toString()));
+
+        }
     }
 
     @Test
@@ -145,18 +192,7 @@ class TimeTableRepositoryTest extends BaseDataJpaTest {
         assertDoesNotThrow(() -> repository.getTimeTableByIdEagerReadOnly(1015L).orElseThrow());
     }
 
-    @Test
-    void getByFilterOld() {
-        final TimeTableQueryFilter build = TimeTableQueryFilter.builder()
-                .dateSession(LocalDate.now())
-                .build();
-        final List<TimeTable> all = repository.findAll(new TimeTableSpecificationImpl().getByFilter(build));
-        final Set<TimeTable> collect = all.stream()
-                .filter(a -> a.getStartSession().isBefore(LocalDateTime.now()))
-                .collect(Collectors.toSet());
-        collect.forEach(g -> log.info(g.toString()));
 
-    }
 
     @Test
     void ifTimeTableExistsByMovieIdInFuture() {

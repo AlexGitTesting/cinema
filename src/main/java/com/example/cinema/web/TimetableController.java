@@ -102,8 +102,9 @@ public class TimetableController implements GetByIdContract<TimeTableDto>, Filte
             then timetables for that day will be shown, otherwise timetables whose start session is after then current moment""",
             content = @Content(schema = @Schema(implementation = TimeTableQueryFilter.class),
                     examples = {
-                            @ExampleObject(name = "By movie id", value = "{\"page\":0,\"limit\":2,\"dateSession\":null,\"movieId\":1}"),
-                            @ExampleObject(name = "By date session", value = "{\"page\":0,\"limit\":2,\"dateSession\":\"2022-10-11\",\"movieId\":null}")
+                            @ExampleObject(name = "By movie id", value = "{\"page\":0,\"limit\":10,\"dateSession\":null,\"movieId\":1,\"hasFreeSeats\":false}"),
+                            @ExampleObject(name = "By date session", value = "{\"page\":0,\"limit\":10,\"dateSession\":\"2022-10-11\",\"movieId\":null,\"hasFreeSeats\":false}"),
+                            @ExampleObject(name = "With free seats only", value = "{\"page\":0,\"limit\":10,\"dateSession\":null,\"movieId\":null,\"hasFreeSeats\":true}", description = "Timetables with free seats will be shown only")
                     })) TimeTableQueryFilter filter) {
         return service.getByFiler(filter);
     }

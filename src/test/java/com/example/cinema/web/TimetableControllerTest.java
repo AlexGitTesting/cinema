@@ -292,7 +292,19 @@ class TimetableControllerTest {
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[*].startSession", everyItem(notNullValue(String.class))))
-                    .andExpect(jsonPath("$.content[*].startSession", everyItem(DateMatcher.getInstance(now))))
+                    .andExpect(jsonPath("$.content[*].startSession", everyItem(DateMatcher.getInstance(now))));
+        }
+
+        @Test
+        void getByFilterActiveFilmsOnly() throws Exception {
+            final TimeTableQueryFilter filter = TimeTableQueryFilter.builder().hasFreeSeats(Boolean.TRUE).build();
+            final MockHttpServletRequestBuilder post = post(prop.getBase().getTimeTable() + prop.getGetByFilter())
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(filter));
+            mockMvc.perform(post)
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[*].isSold", everyItem(equalTo(Boolean.FALSE))))
             ;
         }
     }

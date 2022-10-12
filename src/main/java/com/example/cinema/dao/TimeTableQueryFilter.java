@@ -22,12 +22,17 @@ public final class TimeTableQueryFilter implements Serializable, FilterMarker {
     private final Integer limit;
     private final LocalDate dateSession;
     private final Long movieId;
+    /**
+     * Specify case when only timetables with free seats will be selected
+     */
+    private final boolean hasFreeSeats;
 
     private TimeTableQueryFilter(Builder builder) {
         this.page = builder.page == null || builder.page < 0 ? 0 : builder.page;
-        this.limit = builder.limit == null || builder.limit < 0 ? 2 : builder.limit;
+        this.limit = builder.limit == null || builder.limit < 0 ? 10 : builder.limit;
         this.dateSession = builder.dateSession;
         this.movieId = builder.movieId;
+        this.hasFreeSeats = builder.hasFreeSeats;
     }
 
     public static TimeTableQueryFilter.Builder builder() {
@@ -50,17 +55,21 @@ public final class TimeTableQueryFilter implements Serializable, FilterMarker {
         return ofNullable(movieId);
     }
 
+    public Boolean isHasFreeSeats() {
+        return hasFreeSeats;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TimeTableQueryFilter)) return false;
         TimeTableQueryFilter that = (TimeTableQueryFilter) o;
-        return getPage().equals(that.getPage()) && getLimit().equals(that.getLimit()) && Objects.equals(getDateSession(), that.getDateSession()) && Objects.equals(getMovieId(), that.getMovieId());
+        return isHasFreeSeats() == that.isHasFreeSeats() && Objects.equals(getPage(), that.getPage()) && Objects.equals(getLimit(), that.getLimit()) && Objects.equals(getDateSession(), that.getDateSession()) && Objects.equals(getMovieId(), that.getMovieId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPage(), getLimit(), getDateSession(), getMovieId());
+        return Objects.hash(getPage(), getLimit(), getDateSession(), getMovieId(), isHasFreeSeats());
     }
 
     @JsonPOJOBuilder(withPrefix = "")
@@ -69,6 +78,7 @@ public final class TimeTableQueryFilter implements Serializable, FilterMarker {
         private Integer limit;
         private LocalDate dateSession;
         private Long movieId;
+        private boolean hasFreeSeats;
 
         public TimeTableQueryFilter.Builder page(final Integer page) {
             this.page = page;
@@ -87,6 +97,11 @@ public final class TimeTableQueryFilter implements Serializable, FilterMarker {
 
         public TimeTableQueryFilter.Builder movieId(final Long movieId) {
             this.movieId = movieId;
+            return this;
+        }
+
+        public TimeTableQueryFilter.Builder hasFreeSeats(boolean hasFreeSeats) {
+            this.hasFreeSeats = hasFreeSeats;
             return this;
         }
 
