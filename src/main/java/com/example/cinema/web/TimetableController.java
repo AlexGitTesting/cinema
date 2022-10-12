@@ -104,7 +104,7 @@ public class TimetableController implements GetByIdContract<TimeTableDto>, Filte
                     examples = {
                             @ExampleObject(name = "By movie id", value = "{\"page\":0,\"limit\":10,\"dateSession\":null,\"movieId\":1,\"hasFreeSeats\":false}"),
                             @ExampleObject(name = "By date session", value = "{\"page\":0,\"limit\":10,\"dateSession\":\"2022-10-11\",\"movieId\":null,\"hasFreeSeats\":false}"),
-                            @ExampleObject(name = "With free seats only", value = "{\"page\":0,\"limit\":10,\"dateSession\":null,\"movieId\":null,\"hasFreeSeats\":true}", description = "Timetables with free seats will be shown only")
+                            @ExampleObject(name = "With free seats only", value = "{\"page\":0,\"limit\":10,\"dateSession\":null,\"movieId\":null,\"hasFreeSeats\":true}", description = "Timetables with free seats will be shown only(isSold=false)")
                     })) TimeTableQueryFilter filter) {
         return service.getByFiler(filter);
     }
