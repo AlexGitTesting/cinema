@@ -5,6 +5,7 @@ import com.example.cinema.dao.TimeTableRepository;
 import com.example.cinema.domain.OrderTable;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.OrderDto;
+import com.example.cinema.dto.OrderHumanDto;
 import com.example.cinema.service.converters.OrderConverter;
 import com.example.cinema.service.validator.ValidationService;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
-    public OrderDto createOrder(OrderDto dto) {
+    public OrderHumanDto createOrder(OrderDto dto) {
         validator.validate(dto, OrderDto.class.getSimpleName());
         TimeTable timetable = timeTableRepository.getTimeTableByIdEagerModified(dto.getTimeTableId())
                 .orElseThrow(() ->
@@ -58,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
         orderTable.setTimeTable(timetable);
         orderTable.setOrderPrice(evaluateTotalPrice(timetable, dto));
         orderTable = repository.save(orderTable);
-        return converter.toDto(orderTable);
+        return converter.toHumanDto(orderTable);
 
     }
 
@@ -99,8 +100,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDto getById(Long id) {
-        return converter.toDto(repository.findOrderByIdTimeTableEager(id).orElseThrow(() -> new EntityNotFoundException(format(ORDER_NOT_FOUND, id))));
+    public OrderHumanDto getById(Long id) {
+        return converter.toHumanDto(repository.findOrderByIdEagerAllAttributes(id)
+                .orElseThrow(() -> new EntityNotFoundException(format(ORDER_NOT_FOUND, id))));
     }
 
 }

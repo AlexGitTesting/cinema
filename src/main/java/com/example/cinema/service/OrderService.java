@@ -2,6 +2,7 @@ package com.example.cinema.service;
 
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.OrderDto;
+import com.example.cinema.dto.OrderHumanDto;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Set;
@@ -16,13 +17,13 @@ public interface OrderService {
      * Creates new order.
      *
      * @param dto {@link OrderDto}
-     * @return created OrderDto
+     * @return created OrderHumanDto
      * @throws IllegalArgumentException if you try save order for movie that has already started
      * @throws EntityNotFoundException  if {@link TimeTable} related to this Order not found
      * @throws IllegalStateException    if all seats are sold
      * @see TimeTable#addClosedSeats(Set) will be used to add booked seats
      */
-    OrderDto createOrder(OrderDto dto) throws IllegalArgumentException, EntityNotFoundException, IllegalStateException;
+    OrderHumanDto createOrder(OrderDto dto) throws IllegalArgumentException, EntityNotFoundException, IllegalStateException;
 
     /**
      * Removes Order.
@@ -36,11 +37,11 @@ public interface OrderService {
 
 
     /**
-     * Returns OrderDto by id.
+     * Returns OrderHumanDto by id.
      *
-     * @return {@link OrderDto}
+     * @return {@link OrderHumanDto}
      * @throws EntityNotFoundException id dto not found
      */
-    OrderDto getById(Long id) throws EntityNotFoundException;
+    OrderHumanDto getById(Long id) throws EntityNotFoundException;
 
 }

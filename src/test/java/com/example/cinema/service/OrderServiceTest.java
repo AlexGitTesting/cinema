@@ -3,6 +3,7 @@ package com.example.cinema.service;
 import com.example.cinema.core.ValidationCustomException;
 import com.example.cinema.domain.TimeTable;
 import com.example.cinema.dto.OrderDto;
+import com.example.cinema.dto.OrderHumanDto;
 import com.example.cinema.dto.TimeTableDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -38,24 +40,46 @@ class OrderServiceTest {
     @Autowired
     private TimeTableService tableService;
 
+    @Test
+    void getById() {
+        final long id = 137L;
+        final Set<Short> seats = Set.of((short) 9, (short) 10, (short) 5, (short) 7, (short) 8);
+        final OrderHumanDto b = orderService.getById(id);
+        assertEquals(1022L, b.timeTableId());
+        assertEquals(id, b.id());
+        assertEquals("customer", b.customer());
+        assertTrue(b.seats().containsAll(seats));
+        assertEquals("Dark of the Moon", b.movieTitle());
+        assertEquals("BLACK", b.cinemaHallName());
+
+    }
+
     @Nested
     @DisplayName("Create order case")
     public class CreateOrder {
 
         @Test
         void createOrderStartSessionInFuture() {
+            final Set<Short> seats = Set.of((short) 1, (short) 2, (short) 4);
+            final String customer = "customer";
+            final long timeTableId = 1015L;
             final OrderDto order = OrderDto.builder()
-                    .customer("customer")
+                    .customer(customer)
                     .id(null)
-                    .seats(Set.of((short) 1, (short) 2, (short) 4))
-                    .timeTableId(1015L)
+                    .seats(seats)
+                    .timeTableId(timeTableId)
                     .orderPrice(null)
                     .build();
 
-            final OrderDto orderSaved = assertDoesNotThrow(() -> orderService.createOrder(order));
-            assertNotNull(orderSaved.getId());
-            assertDoesNotThrow(() -> orderSaved.getOrderPrice().orElseThrow());
-
+            final OrderHumanDto dto = assertDoesNotThrow(() -> orderService.createOrder(order));
+            assertNotNull(dto.id());
+            assertNotNull(dto.orderPrice());
+            assertEquals("Transformers", dto.movieTitle());
+            assertEquals("BLACK", dto.cinemaHallName());
+            assertEquals(LocalDate.now().plusDays(1L).atTime(14, 40, 0), dto.startSession());
+            assertTrue(dto.seats().containsAll(seats));
+            assertEquals(customer, dto.customer());
+            assertEquals(timeTableId, dto.timeTableId());
         }
 
         @Test
@@ -144,8 +168,8 @@ class OrderServiceTest {
                     .orderPrice(null)
                     .build();
 
-            final OrderDto saved = assertDoesNotThrow(() -> orderService.createOrder(order));
-            final TimeTableDto byId = tableService.getByIdEagerAsDto(saved.getTimeTableId());
+            final OrderHumanDto saved = assertDoesNotThrow(() -> orderService.createOrder(order));
+            final TimeTableDto byId = tableService.getByIdEagerAsDto(saved.timeTableId());
             assertTrue(byId.isSold());
             assertTrue(byId.closedSeats().containsAll(byId.cinemaHall().seatsType().values().stream()
                     .flatMap(Collection::stream).collect(Collectors.toSet())));
@@ -163,11 +187,11 @@ class OrderServiceTest {
                     .timeTableId(timeTableId)
                     .orderPrice(null)
                     .build();
-            final OrderDto orderDto = assertDoesNotThrow(() -> orderService.createOrder(order));
-            assertTrue(orderDto.getSeats().containsAll(seats));
-            assertTrue(orderDto.getOrderPrice().isPresent());
-            assertTrue(orderDto.getOrderPrice().get() > 0);
-            assertEquals(timeTableId, orderDto.getTimeTableId());
+            final OrderHumanDto orderDto = assertDoesNotThrow(() -> orderService.createOrder(order));
+            assertTrue(orderDto.seats().containsAll(seats));
+            assertNotNull(orderDto.orderPrice());
+            assertTrue(orderDto.orderPrice() > 0);
+            assertEquals(timeTableId, orderDto.timeTableId());
             final Optional<TimeTable> timeTable = tableService.getByIdOptionalLazy(timeTableId);
             assertTrue(timeTable.isPresent());
             assertTrue(timeTable.get().getClosedSeats().containsAll(seats));
@@ -185,16 +209,16 @@ class OrderServiceTest {
                     .timeTableId(timeTableId)
                     .orderPrice(null)
                     .build();
-            final OrderDto orderDto = assertDoesNotThrow(() -> orderService.createOrder(order));
-            assertTrue(orderDto.getOrderPrice().isPresent());
-            assertTrue(orderDto.getOrderPrice().get() > 0);
-            assertEquals(timeTableId, orderDto.getTimeTableId());
+            final OrderHumanDto orderDto = assertDoesNotThrow(() -> orderService.createOrder(order));
+            assertNotNull(orderDto.orderPrice());
+            assertTrue(orderDto.orderPrice() > 0);
+            assertEquals(timeTableId, orderDto.timeTableId());
             final TimeTable timeTable = assertDoesNotThrow(() -> tableService.getByIdEager(timeTableId));
             final int sum = seats.stream()
                     .mapToDouble(seat -> timeTable.getCinemaHall().getSeatTypeBySeatNumber(seat).getCoefficient())
                     .mapToInt(coef -> (int) Math.round(coef * timeTable.getBasePrice()))
                     .sum();
-            assertEquals(sum, orderDto.getOrderPrice().orElseThrow());
+            assertEquals(sum, orderDto.orderPrice());
 
         }
     }
@@ -205,9 +229,9 @@ class OrderServiceTest {
         @Test
         void deleteOrder() {
             final long id = 137L;
-            final OrderDto orderBeforeRemove = orderService.getById(id);
-            final Set<Short> seats = orderBeforeRemove.getSeats();
-            final Long timeTableId = orderBeforeRemove.getTimeTableId();
+            final OrderHumanDto orderBeforeRemove = orderService.getById(id);
+            final Set<Short> seats = orderBeforeRemove.seats();
+            final Long timeTableId = orderBeforeRemove.timeTableId();
             final TimeTable timeTableBeforeRemoveOrder = assertDoesNotThrow(() -> tableService.getByIdOptionalLazy(timeTableId)
                     .orElseThrow());
             assertTrue(timeTableBeforeRemoveOrder.getIsSold());
@@ -239,12 +263,5 @@ class OrderServiceTest {
             final long id = 148L;
             assertThrowsExactly(IllegalStateException.class, () -> orderService.deleteOrder(id), "order.cannot.delete.session.started");
         }
-    }
-
-    @Test
-    void getById() {
-        final OrderDto byId = orderService.getById(137L);
-        assertEquals(1022L, byId.getTimeTableId());
-
     }
 }

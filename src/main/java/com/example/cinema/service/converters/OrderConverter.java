@@ -2,6 +2,7 @@ package com.example.cinema.service.converters;
 
 import com.example.cinema.domain.OrderTable;
 import com.example.cinema.dto.OrderDto;
+import com.example.cinema.dto.OrderHumanDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -21,4 +22,12 @@ public interface OrderConverter {
     @Mapping(target = "orderPrice", ignore = true)
     @Mapping(target = "timeTable", expression = "java(new com.example.cinema.domain.TimeTable(source.getTimeTableId()))")
     OrderTable toDomain(OrderDto source);
+
+
+    @Mapping(target = "movieTitle", expression = "java(source.getTimeTable().getMovie().getTitle())")
+    @Mapping(target = "cinemaHallName", expression = "java(source.getTimeTable().getCinemaHall().getName())")
+    @Mapping(target = "startSession", expression = "java(source.getTimeTable().getStartSession())")
+    @Mapping(target = "orderPrice", expression = "java(source.getOrderPrice().orElse(0))")
+    @Mapping(target = "timeTableId", expression = "java(source.getTimeTable().getId())")
+    OrderHumanDto toHumanDto(OrderTable source);
 }

@@ -1,6 +1,7 @@
 package com.example.cinema.web;
 
 import com.example.cinema.dto.OrderDto;
+import com.example.cinema.dto.OrderHumanDto;
 import com.example.cinema.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,7 @@ public class OrderController {
 
     @Operation(summary = "Creates new order")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Order is created", content = @Content(schema = @Schema(implementation = OrderDto.class))),
+            @ApiResponse(responseCode = "201", description = "Order is created", content = @Content(schema = @Schema(implementation = OrderHumanDto.class))),
             @ApiResponse(responseCode = "400", description = "Not valid dto"
                     , content = @Content(schema = @Schema(implementation = String.class)
                     , examples = {
@@ -50,7 +51,7 @@ public class OrderController {
                             examples = @ExampleObject(value = "Timetable with id \"?\" not found")))})
     @PostMapping(path = "${url.create}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    OrderDto createOrder(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Order dto for creation",
+    OrderHumanDto createOrder(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Order dto for creation",
             content = @Content(examples = {
                     @ExampleObject(name = "Valid dto", value = """
                             {"id":null,"timeTableId":17,"orderPrice":null,"seats":[3,4,5],"customer":"customer"}"""),
@@ -73,7 +74,7 @@ public class OrderController {
 
     @Operation(summary = "Gets order by id.", description = "Gets order by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Order is found", content = @Content(schema = @Schema(implementation = OrderDto.class))),
+            @ApiResponse(responseCode = "200", description = "Order is found", content = @Content(schema = @Schema(implementation = OrderHumanDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameter",
                     headers = @Header(name = "Error message", schema = @Schema(implementation = String.class),
                             description = "Argument is invalid. Number must be not null and greater then 0")),
@@ -83,7 +84,7 @@ public class OrderController {
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(path = "${url.get-by-id}")
-    OrderDto getById(@Parameter(description = "Order id. Not null and greater then 0", examples = {
+    OrderHumanDto getById(@Parameter(description = "Order id. Not null and greater then 0", examples = {
             @ExampleObject(name = "Valid id", value = "1"),
             @ExampleObject(name = "Invalid id,less then 0", value = "-5"),
             @ExampleObject(name = "Invalid id, null", value = "null"),
